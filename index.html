@@ -176,5 +176,56 @@ const analytics = getAnalytics(app);
         // Hírek betöltése az oldal betöltésekor
         window.onload = loadNews;
     </script>
+        document.getElementById('newsForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+      
+          const title = document.getElementById('title').value;
+          const content = document.getElementById('content').value;
+      
+          if (title && content) {
+            db.collection("news").add({
+              title: title,
+              content: content,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+              alert("✅ Hír sikeresen közzétéve!");
+              document.getElementById('newsForm').reset();
+              loadNews(); // Hírek frissítése
+            })
+            .catch(error => {
+              console.error("❌ Hiba történt a mentéskor: ", error);
+              alert("Hiba történt a közzétételnél! Nézd meg a konzolt.");
+            });
+          } else {
+            alert("⚠️ Töltsd ki a cím és a tartalom mezőt!");
+          }
+        });
+      
+        function loadNews() {
+          db.collection("news").orderBy("timestamp", "desc").get()
+          .then((querySnapshot) => {
+            const newsContainer = document.getElementById('newsContainer');
+            newsContainer.innerHTML = ''; // Régi hírek törlése
+            querySnapshot.forEach((doc) => {
+              const newsData = doc.data();
+              const newsItem = document.createElement('div');
+              newsItem.classList.add('news-item');
+              newsItem.innerHTML = `
+                <h3>${newsData.title}</h3>
+                <p>${newsData.content}</p>
+                <small>${new Date(newsData.timestamp?.seconds * 1000).toLocaleString()}</small>
+              `;
+              newsContainer.appendChild(newsItem);
+            });
+          })
+          .catch(error => {
+            console.error("❌ Hiba a hírek betöltésekor: ", error);
+          });
+        }
+      
+        window.onload = loadNews;
+      </script>      
+
 </body>
 </html>
