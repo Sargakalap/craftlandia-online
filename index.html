@@ -1,231 +1,308 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Craftlandia Online - Hírek</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        main {
-            padding: 20px;
-        }
-        section {
-            margin-bottom: 30px;
-        }
-        h2 {
-            color: #2c3e50;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-        input, textarea {
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        button {
-            padding: 10px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
-        #newsContainer {
-            margin-top: 20px;
-        }
-        .news-item {
-            background-color: #ecf0f1;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        .news-item h3 {
-            color: #2980b9;
-        }
-        .news-item p {
-            font-size: 14px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Craftlandia Online - Hírek</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    main {
+      padding: 20px;
+    }
+    section {
+      margin-bottom: 30px;
+    }
+    h2 {
+      color: #2c3e50;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    input, textarea {
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px;
+      background-color: #f3a220;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #d1ea15;
+    }
+    #newsContainer {
+      margin-top: 20px;
+    }
+    .news-item {
+      background-color: #ecf0f1;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    .news-item h3 {
+      color: #2980b9;
+    }
+    .news-item p {
+      font-size: 14px;
+    }
+    /* Stílus az autentikációs szekcióhoz */
+    #authSection {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    /* Stílus az újságközlést tartalmazó részhez */
+    #newsPostingSection {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      display: none;
+    }
+    #userStatus {
+      text-align: right;
+      margin-bottom: 10px;
+    }
+    /* Kép stílus */
+    .news-item img {
+      max-width: 100%;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Craftlandia Online - Hírek</h1>
-    </header>
+  <header>
+    <h1>Craftlandia Online - Hírek</h1>
+  </header>
 
-    <main>
-        <section>
-            <h2>Új hír közzététele</h2>
-            <form id="newsForm">
-                <label for="title">Cím:</label>
-                <input type="text" id="title" name="title" required>
-                
-                <label for="content">Tartalom:</label>
-                <textarea id="content" name="content" required></textarea>
-                
-                <button type="submit">Hír közzététele</button>
-            </form>
-        </section>
+  <main>
+    <!-- Autentikációs szekció: Bejelentkezés és Regisztráció -->
+    <section id="authSection">
+      <h2>Bejelentkezés / Regisztráció</h2>
+      <!-- Bejelentkezési űrlap -->
+      <form id="login-form">
+        <h3>Bejelentkezés</h3>
+        <input type="email" id="login-email" placeholder="Email" required>
+        <input type="password" id="login-password" placeholder="Jelszó" required>
+        <button type="submit">Bejelentkezés</button>
+      </form>
+      <!-- Regisztrációs űrlap -->
+      <form id="signup-form">
+        <h3>Regisztráció</h3>
+        <input type="email" id="signup-email" placeholder="Email" required>
+        <input type="password" id="signup-password" placeholder="Jelszó" required>
+        <button type="submit">Regisztráció</button>
+      </form>
+    </section>
 
-        <section id="newsList">
-            <h2>Legújabb hírek</h2>
-            <div id="newsContainer"></div>
-        </section>
-    </main>
+    <!-- Új hír közzététele (csak bejelentkezett felhasználóknak) -->
+    <section id="newsPostingSection" style="display: none;">
+      <div id="userStatus">
+        Bejelentkezve: <span id="userEmail"></span>
+        <button id="signOutButton">Kijelentkezés</button>
+      </div>
+      <h2>Új hír közzététele</h2>
+      <form id="newsForm">
+        <label for="title">Cím:</label>
+        <input type="text" id="title" name="title" required>
+        
+        <label for="content">Tartalom:</label>
+        <textarea id="content" name="content" required></textarea>
+        
+        <label for="image">Kép feltöltése:</label>
+        <input type="file" id="image" name="image" accept="image/*">
+        
+        <button type="submit">Hír közzététele</button>
+      </form>
+    </section>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <!-- Legújabb hírek listája (mindenki számára elérhető) -->
+    <section id="newsList">
+      <h2>Legújabb hírek</h2>
+      <div id="newsContainer"></div>
+    </section>
+  </main>
 
-    <script>
-        // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+  <!-- Firebase COMPAT SDK-k -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBfkcNHasJkMJz_mpNczcseQAmfDRV5hUI",
-  authDomain: "craftlandia-online.firebaseapp.com",
-  projectId: "craftlandia-online",
-  storageBucket: "craftlandia-online.firebasestorage.app",
-  messagingSenderId: "741338614553",
-  appId: "1:741338614553:web:74ae48162cf3bc2c6e5388",
-  measurementId: "G-QQ1PFTBFZT"
-};
+  <script>
+    // Firebase konfiguráció – cseréld le a saját adataidra!
+    const firebaseConfig = {
+      apiKey: "AIzaSyBfkcNHasJkMJz_mpNczcseQAmfDRV5hUI",
+      authDomain: "craftlandia-online.firebaseapp.com",
+      projectId: "craftlandia-online",
+      storageBucket: "craftlandia-online.firebasestorage.app",
+      messagingSenderId: "741338614553",
+      appId: "1:741338614553:web:74ae48162cf3bc2c6e5388",
+      measurementId: "G-QQ1PFTBFZT"
+    };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-    </script>
-        };
+    // Inicializálás
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
 
-        // Inicializálás
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(app);
+    /* 🔥 Autentikációs funkciók 🔥 */
 
-        // Hír közzétételi form elküldése
-        document.getElementById('newsForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+    // Regisztráció
+    document.getElementById('signup-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
 
-            const title = document.getElementById('title').value;
-            const content = document.getElementById('content').value;
-
-            if (title && content) {
-                // Hír hozzáadása Firestore adatbázishoz
-                db.collection("news").add({
-                    title: title,
-                    content: content,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                })
-                .then(() => {
-                    alert("Hír sikeresen közzétéve!");
-                    document.getElementById('newsForm').reset();
-                    loadNews();  // Új hírek betöltése
-                })
-                .catch(error => {
-                    console.error("Hiba történt a hír mentésekor: ", error);
-                });
-            }
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          alert("Sikeres regisztráció! 🎉");
+          document.getElementById('signup-form').reset();
+        })
+        .catch((error) => {
+          alert("Hiba: " + error.message + " 😬");
+          console.error("Regisztrációs hiba:", error);
         });
+    });
 
-        // Hírek betöltése a Firestore-ból
-        function loadNews() {
-            db.collection("news").orderBy("timestamp", "desc").get().then((querySnapshot) => {
-                const newsContainer = document.getElementById('newsContainer');
-                newsContainer.innerHTML = '';  // Töröljük a régi híreket
+    // Bejelentkezés
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
 
-                querySnapshot.forEach((doc) => {
-                    const newsData = doc.data();
-                    const newsItem = document.createElement('div');
-                    newsItem.classList.add('news-item');
+      auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          alert("Sikeres bejelentkezés! 🚀");
+          document.getElementById('login-form').reset();
+        })
+        .catch((error) => {
+          alert("Hiba: " + error.message + " 😬");
+          console.error("Bejelentkezési hiba:", error);
+        });
+    });
 
-                    const newsTitle = document.createElement('h3');
-                    newsTitle.textContent = newsData.title;
+    // Kijelentkezés
+    document.getElementById('signOutButton').addEventListener('click', function() {
+      auth.signOut().then(() => {
+        alert("Sikeresen kijelentkeztél! 👋");
+      }).catch((error) => {
+        console.error("Kijelentkezési hiba:", error);
+      });
+    });
 
-                    const newsContent = document.createElement('p');
-                    newsContent.textContent = newsData.content;
+    // Autentikációs állapot figyelése
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        // Ha be van jelentkezve, elrejtjük az auth szekciót és megjelenítjük a hír közzétételét
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('newsPostingSection').style.display = 'block';
+        document.getElementById('userEmail').textContent = user.email;
+      } else {
+        // Ha nincs bejelentkezett felhasználó, megmutatjuk az auth szekciót
+        document.getElementById('authSection').style.display = 'block';
+        document.getElementById('newsPostingSection').style.display = 'none';
+      }
+    });
 
-                    newsItem.appendChild(newsTitle);
-                    newsItem.appendChild(newsContent);
+    /* 🚀 Hír közzététele és kép feltöltés 🚀 */
+    document.getElementById('newsForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const content = document.getElementById('content').value;
+      const imageFile = document.getElementById('image').files[0];
 
-                    newsContainer.appendChild(newsItem);
-                });
-            });
-        }
-
-        // Hírek betöltése az oldal betöltésekor
-        window.onload = loadNews;
-    </script>
-        document.getElementById('newsForm').addEventListener('submit', function(e) {
-          e.preventDefault();
-      
-          const title = document.getElementById('title').value;
-          const content = document.getElementById('content').value;
-      
-          if (title && content) {
-            db.collection("news").add({
-              title: title,
-              content: content,
-              timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            })
-            .then(() => {
-              alert("✅ Hír sikeresen közzétéve!");
-              document.getElementById('newsForm').reset();
-              loadNews(); // Hírek frissítése
+      if (title && content) {
+        if (imageFile) {
+          // Ha van kép, először feltöltjük a Firebase Storage-ba
+          const storageRef = storage.ref('news-images/' + imageFile.name);
+          storageRef.put(imageFile)
+            .then(snapshot => snapshot.ref.getDownloadURL())
+            .then(imageUrl => {
+              saveNews(title, content, imageUrl);
             })
             .catch(error => {
-              console.error("❌ Hiba történt a mentéskor: ", error);
-              alert("Hiba történt a közzétételnél! Nézd meg a konzolt.");
+              console.error("❌ Hiba a kép feltöltésekor: ", error);
+              alert("Hiba történt a kép feltöltésénél! 😬");
             });
-          } else {
-            alert("⚠️ Töltsd ki a cím és a tartalom mezőt!");
-          }
-        });
-      
-        function loadNews() {
-          db.collection("news").orderBy("timestamp", "desc").get()
-          .then((querySnapshot) => {
-            const newsContainer = document.getElementById('newsContainer');
-            newsContainer.innerHTML = ''; // Régi hírek törlése
-            querySnapshot.forEach((doc) => {
-              const newsData = doc.data();
-              const newsItem = document.createElement('div');
-              newsItem.classList.add('news-item');
-              newsItem.innerHTML = `
-                <h3>${newsData.title}</h3>
-                <p>${newsData.content}</p>
-                <small>${new Date(newsData.timestamp?.seconds * 1000).toLocaleString()}</small>
-              `;
-              newsContainer.appendChild(newsItem);
-            });
-          })
-          .catch(error => {
-            console.error("❌ Hiba a hírek betöltésekor: ", error);
-          });
+        } else {
+          // Ha nincs kép, csak a szöveges hírt mentjük
+          saveNews(title, content, null);
         }
-      
-        window.onload = loadNews;
-      </script>      
+      } else {
+        alert("⚠️ Töltsd ki a cím és a tartalom mezőt!");
+      }
+    });
 
+    // Függvény a hír mentéséhez (Firestore)
+    function saveNews(title, content, imageUrl) {
+      db.collection("news").add({
+        title: title,
+        content: content,
+        imageUrl: imageUrl || null,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(() => {
+        alert("✅ Hír sikeresen közzétéve!");
+        document.getElementById('newsForm').reset();
+        loadNews(); // Frissítjük a híreket
+      })
+      .catch(error => {
+        console.error("❌ Hiba történt a mentéskor: ", error);
+        alert("Hiba történt a közzétételnél! Nézd meg a konzolt. 😬");
+      });
+    }
+
+    // Hírek betöltése a Firestore-ból
+    function loadNews() {
+      db.collection("news").orderBy("timestamp", "desc").get()
+        .then((querySnapshot) => {
+          const newsContainer = document.getElementById('newsContainer');
+          newsContainer.innerHTML = ''; // Régi hírek törlése
+          querySnapshot.forEach((doc) => {
+            const newsData = doc.data();
+            const newsItem = document.createElement('div');
+            newsItem.classList.add('news-item');
+            const time = newsData.timestamp ? new Date(newsData.timestamp.seconds * 1000).toLocaleString() : '';
+            newsItem.innerHTML = `
+              <h3>${newsData.title}</h3>
+              <p>${newsData.content}</p>
+              ${newsData.imageUrl ? `<img src="${newsData.imageUrl}" alt="Hír képe">` : ""}
+              <small>${time}</small>
+            `;
+            newsContainer.appendChild(newsItem);
+          });
+        })
+        .catch(error => {
+          console.error("❌ Hiba a hírek betöltésekor: ", error);
+        });
+    }
+
+    // Hírek betöltése az oldal betöltésekor
+    window.onload = loadNews;
+  </script>
 </body>
 </html>
