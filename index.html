@@ -90,6 +90,14 @@
       border-radius: 5px;
       margin-top: 10px;
     }
+    /* Google bejelentkezés gomb stílus */
+    #googleSignInButton {
+      background-color: #dd4b39;
+      margin-top: 10px;
+    }
+    #googleSignInButton:hover {
+      background-color: #c23321;
+    }
   </style>
 </head>
 <body>
@@ -108,6 +116,8 @@
         <input type="password" id="login-password" placeholder="Jelszó" required>
         <button type="submit">Bejelentkezés</button>
       </form>
+      <!-- Google bejelentkezés gomb -->
+      <button id="googleSignInButton">Google bejelentkezés</button>
       <!-- Regisztrációs űrlap -->
       <form id="signup-form">
         <h3>Regisztráció</h3>
@@ -188,7 +198,7 @@
         });
     });
 
-    // Bejelentkezés
+    // Bejelentkezés (email/jelszó)
     document.getElementById('login-form').addEventListener('submit', function(e) {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
@@ -205,6 +215,20 @@
         });
     });
 
+    // Google bejelentkezés
+    document.getElementById('googleSignInButton').addEventListener('click', function(e) {
+      e.preventDefault();
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then((result) => {
+          alert("Google bejelentkezés sikeres! 🚀");
+        })
+        .catch((error) => {
+          alert("Hiba a Google bejelentkezéskor: " + error.message + " 😬");
+          console.error("Google bejelentkezési hiba:", error);
+        });
+    });
+
     // Kijelentkezés
     document.getElementById('signOutButton').addEventListener('click', function() {
       auth.signOut().then(() => {
@@ -217,7 +241,7 @@
     // Autentikációs állapot figyelése
     auth.onAuthStateChanged(user => {
       if (user) {
-        // Ha be van jelentkezve, elrejtjük az auth szekciót és megjelenítjük a hír közzétételét
+        // Ha be van jelentkezve, elrejtjük az auth szekciót és megjelenítjük a hír közzététele részt
         document.getElementById('authSection').style.display = 'none';
         document.getElementById('newsPostingSection').style.display = 'block';
         document.getElementById('userEmail').textContent = user.email;
@@ -306,3 +330,4 @@
   </script>
 </body>
 </html>
+
