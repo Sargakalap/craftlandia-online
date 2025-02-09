@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Craftlandia Online - Hírek</title>
   <style>
+    /* Alapstílusok */
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f9;
@@ -17,36 +18,64 @@
       padding: 20px;
       text-align: center;
     }
-    main {
-      padding: 20px;
-    }
-    section {
-      margin-bottom: 30px;
-    }
-    h2 {
-      color: #2c3e50;
-    }
-    form {
+    /* Navigációs sáv */
+    nav {
+      background-color: #34495e;
+      padding: 10px;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
     }
-    input, textarea {
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 16px;
-    }
-    button {
-      padding: 10px;
+    nav button {
+      padding: 10px 20px;
       background-color: #f3a220;
       color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
     }
-    button:hover {
+    nav button:hover {
       background-color: #d1ea15;
+    }
+    #logoutNavBtn {
+      display: none;
+    }
+    /* Modal ablak stílusok */
+    .modal {
+      display: none; /* Kezdetben rejtve */
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+      position: relative;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .modal-content h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+    .close {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      cursor: pointer;
+      font-size: 20px;
+    }
+    /* Egyéb stílusok (pl. hírek listája) */
+    main {
+      padding: 20px;
     }
     #newsContainer {
       margin-top: 20px;
@@ -63,104 +92,66 @@
     .news-item p {
       font-size: 14px;
     }
-    /* Stílus az autentikációs szekcióhoz */
-    #authSection {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
-    /* Stílus az újságközlést tartalmazó részhez */
-    #newsPostingSection {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-      display: none;
-    }
-    #userStatus {
-      text-align: right;
-      margin-bottom: 10px;
-    }
-    /* Kép stílus */
-    .news-item img {
-      max-width: 100%;
-      border-radius: 5px;
-      margin-top: 10px;
-    }
-    /* Google bejelentkezés gomb stílus */
-    #googleSignInButton {
-      background-color: #dd4b39;
-      margin-top: 10px;
-    }
-    #googleSignInButton:hover {
-      background-color: #c23321;
-    }
   </style>
 </head>
 <body>
   <header>
     <h1>Craftlandia Online - Hírek</h1>
   </header>
-
-  <main>
-    <!-- Autentikációs szekció: Bejelentkezés és Regisztráció -->
-    <section id="authSection">
-      <h2>Bejelentkezés / Regisztráció</h2>
-      <!-- Bejelentkezési űrlap -->
-      <form id="login-form">
-        <h3>Bejelentkezés</h3>
-        <input type="email" id="login-email" placeholder="Email" required>
-        <input type="password" id="login-password" placeholder="Jelszó" required>
-        <button type="submit">Bejelentkezés</button>
+  
+  <!-- Navigációs sáv -->
+    <button id="logoutNavBtn">Kilépés</button>
+    <button id="loginNavBtn">Belépés</button>
+    <button id="signupNavBtn">Regisztráció</button>
+    <button id="logoutNavBtn" style="display:none;">Kilépés</button>
+  </nav>
+  
+  <!-- Belépési Modal -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="loginClose">&times;</span>
+      <h2>Belépés</h2>
+      <form id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Email" required>
+        <input type="password" id="loginPassword" placeholder="Jelszó" required>
+        <button type="submit">Belépés</button>
       </form>
       <!-- Google bejelentkezés gomb -->
-      <button id="googleSignInButton">Google bejelentkezés</button>
-      <!-- Regisztrációs űrlap -->
-      <form id="signup-form">
-        <h3>Regisztráció</h3>
-        <input type="email" id="signup-email" placeholder="Email" required>
-        <input type="password" id="signup-password" placeholder="Jelszó" required>
+      <button id="googleLoginBtn" style="margin-top:10px; background-color:#dd4b39; color:white; border:none; border-radius:4px; padding:10px; cursor:pointer; width:100%;">
+        Google bejelentkezés
+      </button>
+    </div>
+  </div>
+  
+  <!-- Regisztrációs Modal -->
+  <div id="signupModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="signupClose">&times;</span>
+      <h2>Regisztráció</h2>
+      <form id="signupForm">
+        <input type="email" id="signupEmail" placeholder="Email" required>
+        <input type="password" id="signupPassword" placeholder="Jelszó" required>
         <button type="submit">Regisztráció</button>
       </form>
-    </section>
-
-    <!-- Új hír közzététele (csak bejelentkezett felhasználóknak) -->
-    <section id="newsPostingSection" style="display: none;">
-      <div id="userStatus">
-        Bejelentkezve: <span id="userEmail"></span>
-        <button id="signOutButton">Kijelentkezés</button>
-      </div>
-      <h2>Új hír közzététele</h2>
-      <form id="newsForm">
-        <label for="title">Cím:</label>
-        <input type="text" id="title" name="title" required>
-        
-        <label for="content">Tartalom:</label>
-        <textarea id="content" name="content" required></textarea>
-        
-        <label for="image">Kép feltöltése:</label>
-        <input type="file" id="image" name="image" accept="image/*">
-        
-        <button type="submit">Hír közzététele</button>
-      </form>
-    </section>
-
-    <!-- Legújabb hírek listája (mindenki számára elérhető) -->
+    </div>
+  </div>
+  
+  <!-- Fő tartalom: Hírek listája -->
+  <main>
     <section id="newsList">
       <h2>Legújabb hírek</h2>
-      <div id="newsContainer"></div>
+      <div id="newsContainer">
+        <!-- Itt jelennek meg a hírek -->
+      </div>
     </section>
   </main>
-
+  
   <!-- Firebase COMPAT SDK-k -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-
+  
   <script>
     // Firebase konfiguráció – cseréld le a saját adataidra!
     const firebaseConfig = {
@@ -172,162 +163,139 @@
       appId: "1:741338614553:web:74ae48162cf3bc2c6e5388",
       measurementId: "G-QQ1PFTBFZT"
     };
-
+    
     // Inicializálás
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
     const storage = firebase.storage();
-
-    /* 🔥 Autentikációs funkciók 🔥 */
-
-    // Regisztráció
-    document.getElementById('signup-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const email = document.getElementById('signup-email').value;
-      const password = document.getElementById('signup-password').value;
-
-      auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          alert("Sikeres regisztráció! 🎉");
-          document.getElementById('signup-form').reset();
-        })
-        .catch((error) => {
-          alert("Hiba: " + error.message + " 😬");
-          console.error("Regisztrációs hiba:", error);
-        });
+    
+    /* 🔥 Navigáció és modal kezelés 🔥 */
+    
+    // DOM elemek
+    const loginNavBtn = document.getElementById("loginNavBtn");
+    const signupNavBtn = document.getElementById("signupNavBtn");
+    const logoutNavBtn = document.getElementById("logoutNavBtn");
+    
+    const loginModal = document.getElementById("loginModal");
+    const signupModal = document.getElementById("signupModal");
+    const loginClose = document.getElementById("loginClose");
+    const signupClose = document.getElementById("signupClose");
+    
+    // Gombokra kattintva megjelenítjük a modális ablakokat
+    loginNavBtn.addEventListener("click", () => {
+      loginModal.style.display = "flex";
+    });
+    signupNavBtn.addEventListener("click", () => {
+      signupModal.style.display = "flex";
+    });
+    
+    // Modal bezárása (x gomb)
+    loginClose.addEventListener("click", () => {
+      loginModal.style.display = "none";
+    });
+    signupClose.addEventListener("click", () => {
+      signupModal.style.display = "none";
+    });
+    
+    // Ha a modalon kívülre kattintanak, akkor bezárjuk
+    window.addEventListener("click", (e) => {
+      if(e.target === loginModal) {
+        loginModal.style.display = "none";
+      }
+      if(e.target === signupModal) {
+        signupModal.style.display = "none";
+      }
     });
 
-    // Bejelentkezés (email/jelszó)
-    document.getElementById('login-form').addEventListener('submit', function(e) {
+    location.protocol === 'https:' ? console.log('Biztonságos a kapcsolat.') : console.log('Nem biztonságos a kapcsolat.');
+    
+    /* 🔐 Autentikációs funkciók 🔐 */
+    
+    // Belépés e-mail/jelszóval
+    document.getElementById("loginForm").addEventListener("submit", (e) => {
       e.preventDefault();
-      const email = document.getElementById('login-email').value;
-      const password = document.getElementById('login-password').value;
-
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+      
       auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          alert("Sikeres bejelentkezés! 🚀");
-          document.getElementById('login-form').reset();
-        })
-        .catch((error) => {
-          alert("Hiba: " + error.message + " 😬");
-          console.error("Bejelentkezési hiba:", error);
-        });
+      .then((userCredential) => {
+        alert("Sikeres bejelentkezés! 🚀");
+        loginModal.style.display = "none";
+        document.getElementById("loginForm").reset();
+      })
+      .catch((error) => {
+        alert("Hiba: " + error.message + " 😬");
+        console.error("Bejelentkezési hiba:", error);
+      });
     });
-
+    
     // Google bejelentkezés
-    document.getElementById('googleSignInButton').addEventListener('click', function(e) {
-      e.preventDefault();
+    document.getElementById("googleLoginBtn").addEventListener("click", () => {
       const provider = new firebase.auth.GoogleAuthProvider();
       auth.signInWithPopup(provider)
-        .then((result) => {
-          alert("Google bejelentkezés sikeres! 🚀");
+      .then((result) => {
+        alert("Sikeres bejelentkezés Google fiókkal! 🚀");
+        loginModal.style.display = "none";
+      })
+      .catch((error) => {
+        alert("Hiba a Google bejelentkezéskor: " + error.message + " 😬");
+        console.error("Google bejelentkezési hiba:", error);
+      });
+    });
+    
+    // Regisztráció és megerősítő email küldés
+    document.getElementById("signupForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("signupEmail").value;
+      const password = document.getElementById("signupPassword").value;
+      
+      auth.createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        // Küldjük el a megerősítő e-mailt
+        userCredential.user.sendEmailVerification()
+        .then(() => {
+          alert("Sikeres regisztráció! 📩 Kérlek, erősítsd meg az e-mail címedet!");
+          signupModal.style.display = "none";
+          document.getElementById("signupForm").reset();
         })
         .catch((error) => {
-          alert("Hiba a Google bejelentkezéskor: " + error.message + " 😬");
-          console.error("Google bejelentkezési hiba:", error);
+          alert("Hiba az e-mail megerősítés küldésekor: " + error.message);
+          console.error("Email verification error:", error);
         });
+      })
+      .catch((error) => {
+        alert("Hiba: " + error.message + " 😬");
+        console.error("Regisztrációs hiba:", error);
+      });
     });
-
-    // Kijelentkezés
-    document.getElementById('signOutButton').addEventListener('click', function() {
-      auth.signOut().then(() => {
+    
+    // Kilépés
+    logoutNavBtn.addEventListener("click", () => {
+      auth.signOut()
+      .then(() => {
         alert("Sikeresen kijelentkeztél! 👋");
-      }).catch((error) => {
+      })
+      .catch((error) => {
+        alert("Hiba a kijelentkezésnél: " + error.message + " 😬");
         console.error("Kijelentkezési hiba:", error);
       });
     });
-
+    
     // Autentikációs állapot figyelése
-    auth.onAuthStateChanged(user => {
+    auth.onAuthStateChanged((user) => {
       if (user) {
-        // Ha be van jelentkezve, elrejtjük az auth szekciót és megjelenítjük a hír közzététele részt
-        document.getElementById('authSection').style.display = 'none';
-        document.getElementById('newsPostingSection').style.display = 'block';
-        document.getElementById('userEmail').textContent = user.email;
+        // Bejelentkezett felhasználó esetén elrejtjük a belépés/regisztráció gombokat,
+        // és megjelenítjük a kilépés gombot.
+        loginNavBtn.style.display = "none";
+        signupNavBtn.style.display = "none";
+        logoutNavBtn.style.display = "inline-block";
       } else {
-        // Ha nincs bejelentkezett felhasználó, megmutatjuk az auth szekciót
-        document.getElementById('authSection').style.display = 'block';
-        document.getElementById('newsPostingSection').style.display = 'none';
+        loginNavBtn.style.display = "inline-block";
+        signupNavBtn.style.display = "inline-block";
+        logoutNavBtn.style.display = "none";
       }
     });
-
-    /* 🚀 Hír közzététele és kép feltöltés 🚀 */
-    document.getElementById('newsForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const title = document.getElementById('title').value;
-      const content = document.getElementById('content').value;
-      const imageFile = document.getElementById('image').files[0];
-
-      if (title && content) {
-        if (imageFile) {
-          // Ha van kép, először feltöltjük a Firebase Storage-ba
-          const storageRef = storage.ref('news-images/' + imageFile.name);
-          storageRef.put(imageFile)
-            .then(snapshot => snapshot.ref.getDownloadURL())
-            .then(imageUrl => {
-              saveNews(title, content, imageUrl);
-            })
-            .catch(error => {
-              console.error("❌ Hiba a kép feltöltésekor: ", error);
-              alert("Hiba történt a kép feltöltésénél! 😬");
-            });
-        } else {
-          // Ha nincs kép, csak a szöveges hírt mentjük
-          saveNews(title, content, null);
-        }
-      } else {
-        alert("⚠️ Töltsd ki a cím és a tartalom mezőt!");
-      }
-    });
-
-    // Függvény a hír mentéséhez (Firestore)
-    function saveNews(title, content, imageUrl) {
-      db.collection("news").add({
-        title: title,
-        content: content,
-        imageUrl: imageUrl || null,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      })
-      .then(() => {
-        alert("✅ Hír sikeresen közzétéve!");
-        document.getElementById('newsForm').reset();
-        loadNews(); // Frissítjük a híreket
-      })
-      .catch(error => {
-        console.error("❌ Hiba történt a mentéskor: ", error);
-        alert("Hiba történt a közzétételnél! Nézd meg a konzolt. 😬");
-      });
-    }
-
-    // Hírek betöltése a Firestore-ból
-    function loadNews() {
-      db.collection("news").orderBy("timestamp", "desc").get()
-        .then((querySnapshot) => {
-          const newsContainer = document.getElementById('newsContainer');
-          newsContainer.innerHTML = ''; // Régi hírek törlése
-          querySnapshot.forEach((doc) => {
-            const newsData = doc.data();
-            const newsItem = document.createElement('div');
-            newsItem.classList.add('news-item');
-            const time = newsData.timestamp ? new Date(newsData.timestamp.seconds * 1000).toLocaleString() : '';
-            newsItem.innerHTML = `
-              <h3>${newsData.title}</h3>
-              <p>${newsData.content}</p>
-              ${newsData.imageUrl ? `<img src="${newsData.imageUrl}" alt="Hír képe">` : ""}
-              <small>${time}</small>
-            `;
-            newsContainer.appendChild(newsItem);
-          });
-        })
-        .catch(error => {
-          console.error("❌ Hiba a hírek betöltésekor: ", error);
-        });
-    }
-
-    // Hírek betöltése az oldal betöltésekor
-    window.onload = loadNews;
   </script>
 </body>
 </html>
-
