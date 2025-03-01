@@ -141,8 +141,9 @@
         <label for="content">Tartalom:</label>
         <textarea id="content" name="content" required></textarea>
 
-        <label for="image">Kép feltöltése:</label>
-        <input type="file" id="image" name="image" accept="image/*">
+        <label for="image">Képek feltöltése:</label>
+        <!-- multiple attribútum hozzáadva, hogy több képet is lehessen választani -->
+        <input type="file" id="image" name="image" accept="image/*" multiple>
 
         <button type="submit">Hír közzététele</button>
       </form>
@@ -199,7 +200,6 @@
     });
 
     // Bejelentkezés
-    // Bejelentkezés (email/jelszó)
     document.getElementById('login-form').addEventListener('submit', function(e) {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
@@ -229,6 +229,7 @@
           console.error("Google bejelentkezési hiba:", error);
         });
     });
+
     // Kijelentkezés
     document.getElementById('signOutButton').addEventListener('click', function() {
       auth.signOut().then(() => {
@@ -241,13 +242,10 @@
     // Autentikációs állapot figyelése
     auth.onAuthStateChanged(user => {
       if (user) {
-        // Ha be van jelentkezve, elrejtjük az auth szekciót és megjelenítjük a hír közzétételét
-        // Ha be van jelentkezve, elrejtjük az auth szekciót és megjelenítjük a hír közzététele részt
         document.getElementById('authSection').style.display = 'none';
         document.getElementById('newsPostingSection').style.display = 'block';
         document.getElementById('userEmail').textContent = user.email;
       } else {
-        // Ha nincs bejelentkezett felhasználó, megmutatjuk az auth szekciót
         document.getElementById('authSection').style.display = 'block';
         document.getElementById('newsPostingSection').style.display = 'none';
       }
@@ -258,20 +256,29 @@
       e.preventDefault();
       const title = document.getElementById('title').value;
       const content = document.getElementById('content').value;
-      const imageFile = document.getElementById('image').files[0];
+      const imageFiles = document.getElementById('image').files;
 
       if (title && content) {
-        if (imageFile) {
-          // Ha van kép, először feltöltjük a Firebase Storage-ba
-          const storageRef = storage.ref('news-images/' + imageFile.name);
-          storageRef.put(imageFile)
-            .then(snapshot => snapshot.ref.getDownloadURL())
-            .then(imageUrl => {
-              saveNews(title, content, imageUrl);
-            })
-            .catch(error => {
-              console.error("❌ Hiba a kép feltöltésekor: ", error);
-              alert("Hiba történt a kép feltöltésénél! 😬");
+        if (imageFiles.length > 0) {
+          // Több kép feltöltése: Promise.all segítségével várjuk meg az összes képfeltöltést
+          const uploadPromises = [];
+          const imageUrls = [];
+          for (let i = 0; i < imageFiles.length; i++) {
+            const file = imageFiles[i];
+            const storageRef = storage.ref('news-images/' + Date.now() + '_' + file.name);
+            const uploadTask = storageRef.put(file).then(snapshot => snapshot.ref.getDownloadURL())
+              .then(url => {
+                imageUrls.push(url);
+              })
+              .catch(error => {
+                console.error("❌ Hiba a kép feltöltésekor: ", error);
+                alert("Hiba történt a kép feltöltésénél! 😬");
+              });
+            uploadPromises.push(uploadTask);
+          }
+          Promise.all(uploadPromises)
+            .then(() => {
+              saveNews(title, content, imageUrls);
             });
         } else {
           // Ha nincs kép, csak a szöveges hírt mentjük
@@ -283,11 +290,11 @@
     });
 
     // Függvény a hír mentéséhez (Firestore)
-    function saveNews(title, content, imageUrl) {
+    function saveNews(title, content, imageUrls) {
       db.collection("news").add({
         title: title,
         content: content,
-        imageUrl: imageUrl || null,
+        imageUrls: imageUrls || null,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       })
       .then(() => {
@@ -312,10 +319,16 @@
             const newsItem = document.createElement('div');
             newsItem.classList.add('news-item');
             const time = newsData.timestamp ? new Date(newsData.timestamp.seconds * 1000).toLocaleString() : '';
+            let imagesHtml = '';
+            if (newsData.imageUrls && Array.isArray(newsData.imageUrls)) {
+              newsData.imageUrls.forEach(url => {
+                imagesHtml += `<img src="${url}" alt="Hír képe">`;
+              });
+            }
             newsItem.innerHTML = `
               <h3>${newsData.title}</h3>
               <p>${newsData.content}</p>
-              ${newsData.imageUrl ? `<img src="${newsData.imageUrl}" alt="Hír képe">` : ""}
+              ${imagesHtml}
               <small>${time}</small>
             `;
             newsContainer.appendChild(newsItem);
@@ -331,3 +344,4 @@
   </script>
 </body>
 </html>
+
