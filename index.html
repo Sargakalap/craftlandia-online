@@ -152,10 +152,10 @@
       background-color: #aa41ff;
       width: 100%;
       max-width: 400px;
-      margin: 30px 0 20px; /* Felső margó növelve */
+      margin: 30px 0 20px;
     }
     
-    /* Felhasználói státusz (a bejelentkezés után a menüben) */
+    /* Felhasználói státusz (a bejelentkezés után) */
     #userStatus {
       text-align: right;
       margin-bottom: 20px;
@@ -229,7 +229,8 @@
     <nav>
       <a href="#" id="homeLink">Főoldal</a>
       <a href="#" id="loginLink">Bejelentkezés</a>
-      <!-- További menüpontok, ha kell -->
+      <a href="#" id="newsPostLink" style="display:none;">Hírírás</a>
+      <a href="#" id="signOutLink" style="display:none;">Kijelentkezés</a>
     </nav>
   </header>
   
@@ -381,13 +382,40 @@
         });
     });
     
+    // A menüsávon is legyen a kijelentkezés gomb (dinamikusan kezelt)
+    document.getElementById('signOutLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      auth.signOut()
+        .then(() => {
+          alert("Sikeres kijelentkezés! 👋");
+        })
+        .catch((error) => {
+          console.error("Kijelentkezési hiba:", error);
+        });
+    });
+    
+    // A "Hírírás" gomb navigáció (például az oldal tetején marad a posztoló részhez)
+    document.getElementById('newsPostLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      // Görgetés a hír közzététel részhez
+      document.getElementById('newsPostingSection').scrollIntoView({ behavior: 'smooth' });
+    });
+    
     // Autentikációs állapot figyelése
     auth.onAuthStateChanged(user => {
       if (user) {
         document.getElementById('newsPostingSection').style.display = 'block';
         document.getElementById('userEmail').textContent = user.email;
+        // A menüben: ha be van jelentkezve, elrejtjük a "Bejelentkezés" gombot,
+        // és megjelenítjük a "Hírírás" és "Kijelentkezés" gombokat.
+        document.getElementById('loginLink').style.display = 'none';
+        document.getElementById('newsPostLink').style.display = 'inline';
+        document.getElementById('signOutLink').style.display = 'inline';
       } else {
         document.getElementById('newsPostingSection').style.display = 'none';
+        document.getElementById('loginLink').style.display = 'inline';
+        document.getElementById('newsPostLink').style.display = 'none';
+        document.getElementById('signOutLink').style.display = 'none';
       }
     });
     
@@ -460,7 +488,6 @@
             if (newsData.imageUrls && Array.isArray(newsData.imageUrls)) {
               newsData.imageUrls.forEach(url => { imagesHtml += `<img src="${url}" alt="Hír képe">`; });
             }
-            // Ha vannak tagek, jelenítsük meg őket egy kis lista formájában
             let tagsHtml = "";
             if (newsData.tags && newsData.tags.length > 0) {
               tagsHtml = `<p><strong>Tagek:</strong> ${newsData.tags.join(', ')}</p>`;
