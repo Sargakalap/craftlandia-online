@@ -1,1 +1,536 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Craftlandia Online - Hírek</title>
+  <link rel="icon" href="https://static.wixstatic.com/media/568af0_1cfdea1c0f4840ff8cc25028bfc84923~mv2.png" type="image/png">
+  <style>
+    /* Alap beállítások */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #1e1e2f;
+      color: #f0f0f0;
+      line-height: 1.6;
+    }
+    a {
+      color: #ffa726;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Fejléc és menüsáv */
+    header {
+      background: linear-gradient(135deg, #3f3f70, #2c2c50);
+      padding: 20px;
+      border-bottom: 3px solid #ffa726;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    nav a {
+      font-size: 1rem;
+      padding: 8px 16px;
+      border-radius: 4px;
+      background-color: rgba(255, 167, 38, 0.2);
+      transition: background-color 0.3s;
+    }
+    nav a:hover {
+      background-color: rgba(255, 167, 38, 0.4);
+    }
+    
+    /* Fő tartalom */
+    main {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    
+    /* Szekciók */
+    section {
+      background-color: #29293d;
+      margin-bottom: 30px;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+    section h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #ffa726;
+      padding-bottom: 10px;
+    }
+    
+    /* Űrlap stílusok */
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    input, textarea {
+      padding: 15px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: #3b3b55;
+      color: #fff;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      box-shadow: 0 0 5px 2px #ffa726;
+    }
+    button {
+      padding: 15px;
+      background-color: #ffa726;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      color: #1e1e2f;
+    }
+    button:hover {
+      background-color: #ffb74d;
+      transform: translateY(-2px);
+    }
+    
+    /* Modal (bejelentkezési ablak) */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .modal-content {
+      background-color: #29293d;
+      padding: 30px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      position: relative;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+    .modal-content h2 {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .close-modal {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #ffa726;
+    }
+    
+    /* Google bejelentkezés gomb módosítva */
+    #googleSignInButton {
+      background-color: #aa41ff;
+      width: 100%;
+      max-width: 400px;
+      margin: 30px 0 20px;
+    }
+    
+    /* Felhasználói státusz (a bejelentkezés után) */
+    #userStatus {
+      text-align: right;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+    #userStatus button {
+      background-color: #e53935;
+      margin-left: 10px;
+    }
+    
+    /* Hír lista */
+    #newsContainer {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-gap: 20px;
+    }
+    .news-item {
+      background-color: #3b3b55;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: transform 0.3s;
+    }
+    .news-item:hover {
+      transform: translateY(-5px);
+    }
+    .news-item h3 {
+      color: #ffa726;
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+    }
+    .news-item p {
+      font-size: 0.95rem;
+      margin-bottom: 15px;
+    }
+    .news-item img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .news-item small {
+      color: #b0b0b0;
+    }
+    
+    /* Tag választó stílusok */
+    fieldset {
+      border: 1px solid #ffa726;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    fieldset legend {
+      padding: 0 5px;
+      font-weight: bold;
+      color: #ffa726;
+    }
+    fieldset label {
+      margin-right: 15px;
+      font-size: 0.95rem;
+      display: inline-block;
+      margin-bottom: 5px;
+    }
+    fieldset input[type="checkbox"] {
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Craftlandia Online - Hírek</h1>
+    <nav>
+      <a href="index.html" id="homeLink">Főoldal</a>
+      <a href="#" id="loginLink">Bejelentkezés</a>
+      <a href="#" id="newsPostLink" style="display:none;">Hírírás</a>
+      <a href="#" id="signOutLink" style="display:none;">Kijelentkezés</a>
+      <a href="festival.html" id="festivalslink">Események</a>
+    </nav>
+  </header>
+  
+  <!-- Bejelentkezési Modal -->
+  <div class="modal" id="authModal">
+    <div class="modal-content">
+      <span class="close-modal" id="closeModal">&times;</span>
+      <h2>Bejelentkezés / Regisztráció</h2>
+      <!-- Bejelentkezési űrlap -->
+      <form id="login-form">
+        <input type="email" id="login-email" placeholder="Email" required>
+        <input type="password" id="login-password" placeholder="Jelszó" required>
+        <button type="submit">Bejelentkezés</button>
+      </form>
+      <!-- Google bejelentkezés gomb -->
+      <button id="googleSignInButton">
+        <img src="https://static.vecteezy.com/system/resources/thumbnails/046/861/647/small/google-logo-transparent-background-free-png.png" alt="Google logo" style="height:20px; margin-right:10px; vertical-align: middle;">
+        Google bejelentkezés
+      </button>
+      <!-- Regisztrációs űrlap -->
+      <form id="signup-form">
+        <input type="email" id="signup-email" placeholder="Email" required>
+        <input type="password" id="signup-password" placeholder="Jelszó" required>
+        <button type="submit">Regisztráció</button>
+      </form>
+    </div>
+  </div>
+  
+  <main>
+    <!-- Új hír közzététele (csak bejelentkezett felhasználóknak) -->
+    <section id="newsPostingSection" style="display: none;">
+      <div id="userStatus">
+        Bejelentkezve: <span id="userEmail"></span>
+        <button id="signOutButton">Kijelentkezés</button>
+      </div>
+      <h2>Új hír közzététele</h2>
+      <form id="newsForm">
+        <label for="title">Cím:</label>
+        <input type="text" id="title" name="title" required>
+        <label for="content">Tartalom:</label>
+        <textarea id="content" name="content" required></textarea>
+        <!-- Tag választó rész -->
+        <fieldset>
+          <legend>Válaszd ki a tageket:</legend>
+          <label><input type="checkbox" name="tags" value="politics">Politika</label>
+          <label><input type="checkbox" name="tags" value="country">Ország</label>
+          <label><input type="checkbox" name="tags" value="tech">Tech</label>
+          <label><input type="checkbox" name="tags" value="science">Tudomány</label>
+          <label><input type="checkbox" name="tags" value="life">Élet</label>
+          <label><input type="checkbox" name="tags" value="important">FONTOS</label>
+          <label><input type="checkbox" name="tags" value="vechiles">Járművek</label>
+          <label><input type="checkbox" name="tags" value="outside">Külföld</label>
+          <label><input type="checkbox" name="tags" value="bc">Bazsi City</label>
+          <label><input type="checkbox" name="tags" value="bf">Bazsi Fest</label>
+          <label><input type="checkbox" name="tags" value="ad">Reklám</label>
+        </fieldset>
+        <label for="image">Képek feltöltése:</label>
+        <input type="file" id="image" name="image" accept="image/*" multiple>
+        <button type="submit">Hír közzététele</button>
+      </form>
+    </section>
+    
+    <!-- Legújabb hírek listája -->
+    <section id="newsList">
+      <h2>Legújabb hírek</h2>
+      <div id="newsContainer"></div>
+    </section>
+  </main>
+  
+  <!-- Firebase SDK-k -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+  <script>
+    // Firebase konfiguráció – cseréld le a saját adataidra!
+    const firebaseConfig = {
+      apiKey: "AIzaSyBfkcNHasJkMJz_mpNczcseQAmfDRV5hUI",
+      authDomain: "craftlandia-online.firebaseapp.com",
+      projectId: "craftlandia-online",
+      storageBucket: "craftlandia-online.firebasestorage.app",
+      messagingSenderId: "741338614553",
+      appId: "1:741338614553:web:74ae48162cf3bc2c6e5388",
+      measurementId: "G-QQ1PFTBFZT"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+    
+    /* 🔥 Autentikációs funkciók 🔥 */
+    // Regisztráció
+    document.getElementById('signup-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(() => {
+          alert("Sikeres regisztráció! 🎉");
+          document.getElementById('signup-form').reset();
+        })
+        .catch((error) => {
+          alert("Hiba: " + error.message + " 😬");
+          console.error("Regisztrációs hiba:", error);
+        });
+    });
+    
+    // Bejelentkezés
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          alert("Sikeres bejelentkezés! 🚀");
+          document.getElementById('login-form').reset();
+          closeModal();
+        })
+        .catch((error) => {
+          alert("Hiba: " + error.message + " 😬");
+          console.error("Bejelentkezési hiba:", error);
+        });
+    });
+    
+    // Google bejelentkezés
+    document.getElementById('googleSignInButton').addEventListener('click', function(e) {
+      e.preventDefault();
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then(() => {
+          alert("Google bejelentkezés sikeres! 🚀");
+          closeModal();
+        })
+        .catch((error) => {
+          alert("Hiba a Google bejelentkezéskor: " + error.message + " 😬");
+          console.error("Google bejelentkezési hiba:", error);
+        });
+    });
+    
+    // Kijelentkezés
+    document.getElementById('signOutButton').addEventListener('click', function() {
+      auth.signOut()
+        .then(() => {
+          alert("Sikeres kijelentkezés! 👋");
+        })
+        .catch((error) => {
+          console.error("Kijelentkezési hiba:", error);
+        });
+    });
+    
+    // A menüsávon is legyen a kijelentkezés gomb (dinamikusan kezelt)
+    document.getElementById('signOutLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      auth.signOut()
+        .then(() => {
+          alert("Sikeres kijelentkezés! 👋");
+        })
+        .catch((error) => {
+          console.error("Kijelentkezési hiba:", error);
+        });
+    });
+    
+    // A "Hírírás" gomb navigáció (például az oldal tetején marad a posztoló részhez)
+    document.getElementById('newsPostLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      // Görgetés a hír közzététel részhez
+      document.getElementById('newsPostingSection').scrollIntoView({ behavior: 'smooth' });
+    });
+    
+    // Autentikációs állapot figyelése
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById('newsPostingSection').style.display = 'block';
+        document.getElementById('userEmail').textContent = user.email;
+        // A menüben: ha be van jelentkezve, elrejtjük a "Bejelentkezés" gombot,
+        // és megjelenítjük a "Hírírás" és "Kijelentkezés" gombokat.
+        document.getElementById('loginLink').style.display = 'none';
+        document.getElementById('newsPostLink').style.display = 'inline';
+        document.getElementById('signOutLink').style.display = 'inline';
+      } else {
+        document.getElementById('newsPostingSection').style.display = 'none';
+        document.getElementById('loginLink').style.display = 'inline';
+        document.getElementById('newsPostLink').style.display = 'none';
+        document.getElementById('signOutLink').style.display = 'none';
+      }
+    });
+    
+    /* 🚀 Hír közzététele és kép feltöltés 🚀 */
+    document.getElementById('newsForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const content = document.getElementById('content').value;
+      const imageFiles = document.getElementById('image').files;
+      
+      // Gyűjtsd össze a kiválasztott tageket
+      const tagCheckboxes = document.querySelectorAll('input[name="tags"]:checked');
+      const tags = Array.from(tagCheckboxes).map(cb => cb.value);
+    
+      if (title && content) {
+        if (imageFiles.length > 0) {
+          const uploadPromises = [];
+          const imageUrls = [];
+          for (let i = 0; i < imageFiles.length; i++) {
+            const file = imageFiles[i];
+            const storageRef = storage.ref('news-images/' + Date.now() + '_' + file.name);
+            const uploadTask = storageRef.put(file)
+              .then(snapshot => snapshot.ref.getDownloadURL())
+              .then(url => { imageUrls.push(url); })
+              .catch(error => {
+                console.error("❌ Hiba a kép feltöltésekor: ", error);
+                alert("Hiba történt a kép feltöltésénél! 😬");
+              });
+            uploadPromises.push(uploadTask);
+          }
+          Promise.all(uploadPromises).then(() => { saveNews(title, content, imageUrls, tags); });
+        } else {
+          saveNews(title, content, null, tags);
+        }
+      } else {
+        alert("⚠️ Töltsd ki a cím és a tartalom mezőt!");
+      }
+    });
+    
+    function saveNews(title, content, imageUrls, tags) {
+      db.collection("news").add({
+        title: title,
+        content: content,
+        imageUrls: imageUrls || null,
+        tags: tags,  // itt mentjük el a tag tömböt
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(() => {
+        alert("✅ Hír sikeresen közzétéve!");
+        document.getElementById('newsForm').reset();
+        loadNews();
+      })
+      .catch(error => {
+        console.error("❌ Hiba történt a mentéskor: ", error);
+        alert("Hiba történt a közzétételnél! Nézd meg a konzolt. 😬");
+      });
+    }
+    
+    function loadNews() {
+      db.collection("news").orderBy("timestamp", "desc").get()
+        .then(querySnapshot => {
+          const newsContainer = document.getElementById('newsContainer');
+          newsContainer.innerHTML = "";
+          querySnapshot.forEach(doc => {
+            const newsData = doc.data();
+            const newsItem = document.createElement('div');
+            newsItem.classList.add('news-item');
+            const time = newsData.timestamp ? new Date(newsData.timestamp.seconds * 1000).toLocaleString() : '';
+            let imagesHtml = "";
+            if (newsData.imageUrls && Array.isArray(newsData.imageUrls)) {
+              newsData.imageUrls.forEach(url => { imagesHtml += `<img src="${url}" alt="Hír képe">`; });
+            }
+            let tagsHtml = "";
+            if (newsData.tags && newsData.tags.length > 0) {
+              tagsHtml = `<p><strong>Tagek:</strong> ${newsData.tags.join(', ')}</p>`;
+            }
+            newsItem.innerHTML = `
+              <h3>${newsData.title}</h3>
+              <p>${newsData.content}</p>
+              ${imagesHtml}
+              ${tagsHtml}
+              <small>${time}</small>
+            `;
+            newsContainer.appendChild(newsItem);
+          });
+        })
+        .catch(error => {
+          console.error("❌ Hiba a hírek betöltésekor: ", error);
+        });
+    }
+    
+    window.onload = loadNews;
+    
+    /* Modal megnyitás/zárás kezelése */
+    const authModal = document.getElementById('authModal');
+    const loginLink = document.getElementById('loginLink');
+    const closeModalBtn = document.getElementById('closeModal');
+    
+    loginLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      authModal.style.display = 'flex';
+    });
+    
+    function closeModal() {
+      authModal.style.display = 'none';
+    }
+    
+    closeModalBtn.addEventListener('click', closeModal);
+    window.addEventListener('click', (e) => {
+      if(e.target === authModal) {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
 
