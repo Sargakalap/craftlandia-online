@@ -3,8 +3,7 @@
 Üdvözlünk a **Craftlandia Online** világában! 🌍 Ez a projekt a Craftlandia digitális közösségének hírportálja és információs központja.
 
 ## 🔥 Jellemzők
-- 📰 Friss hírek és események Craftlandiáról  
-- 📺 B TV – Craftlandia hivatalos streaming platformja  
+- 📰 Friss hírek és események Craftlandiáról    
 - 🌍 Közösségi bejegyzések és interaktív tartalmak  
 
 ## 📌 Hogyan érheted el?
