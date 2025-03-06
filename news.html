@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Craftlandia Online - Hírek</title>
   <link rel="icon" href="https://static.wixstatic.com/media/568af0_1cfdea1c0f4840ff8cc25028bfc84923~mv2.png" type="image/png">
+  <!-- Google Fonts: Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome ikonok -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     /* Alap beállítások */
     * {
@@ -72,6 +76,33 @@
       max-width: 1000px;
       margin: 40px auto;
       padding: 0 20px;
+    }
+    
+    /* Hero szekció - menő kép és szöveg */
+    #hero {
+      background-image: url('https://via.placeholder.com/1500x500');
+      background-size: cover;
+      background-position: center;
+      height: 500px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #hero .hero-text {
+      text-align: center;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 20px;
+      border-radius: 10px;
+    }
+    #hero h2 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      color: #ffa726;
+    }
+    #hero p {
+      font-size: 1.2rem;
+      color: #fff;
     }
     
     /* Szekciók */
@@ -235,14 +266,22 @@
   </style>
 </head>
 <body>
+  <!-- Hero szekció, hogy igazán menő legyen az oldal! 😎 -->
+  <section id="hero">
+    <div class="hero-text">
+      <h2><i class="fas fa-bolt"></i> Üdv a Craftlandia Hírek világában!</h2>
+      <p>Nézd meg a legfrissebb eseményeket és híreket, mindig naprakész lehetsz! 🚀</p>
+    </div>
+  </section>
+  
   <header>
-    <h1>Craftlandia Online - Hírek</h1>
+    <h1><i class="fas fa-newspaper"></i> Craftlandia Online - Hírek</h1>
     <nav>
-      <a href="index.html" id="homeLink">Főoldal</a>
-      <a href="#" id="loginLink">Bejelentkezés</a>
-      <a href="#" id="newsPostLink" style="display:none;">Hírírás</a>
-      <a href="#" id="signOutLink" style="display:none;">Kijelentkezés</a>
-      <a href="festival.html" id="festivalslink">Események</a>
+      <a href="index.html" id="homeLink"><i class="fas fa-home"></i> Főoldal</a>
+      <a href="#" id="loginLink"><i class="fas fa-sign-in-alt"></i> Bejelentkezés</a>
+      <a href="#" id="newsPostLink" style="display:none;"><i class="fas fa-edit"></i> Hírírás</a>
+      <a href="#" id="signOutLink" style="display:none;"><i class="fas fa-sign-out-alt"></i> Kijelentkezés</a>
+      <a href="festival.html" id="festivalslink"><i class="fas fa-calendar-alt"></i> Események</a>
     </nav>
   </header>
   
@@ -278,7 +317,7 @@
         Bejelentkezve: <span id="userEmail"></span>
         <button id="signOutButton">Kijelentkezés</button>
       </div>
-      <h2>Új hír közzététele</h2>
+      <h2><i class="fas fa-upload"></i> Új hír közzététele</h2>
       <form id="newsForm">
         <label for="title">Cím:</label>
         <input type="text" id="title" name="title" required>
@@ -307,7 +346,7 @@
     
     <!-- Legújabb hírek listája -->
     <section id="newsList">
-      <h2>Legújabb hírek</h2>
+      <h2><i class="fas fa-bolt"></i> Legújabb hírek</h2>
       <div id="newsContainer"></div>
     </section>
   </main>
@@ -406,10 +445,9 @@
         });
     });
     
-    // A "Hírírás" gomb navigáció (például az oldal tetején marad a posztoló részhez)
+    // A "Hírírás" gomb navigáció (görgetés a posztoló részhez)
     document.getElementById('newsPostLink').addEventListener('click', function(e) {
       e.preventDefault();
-      // Görgetés a hír közzététel részhez
       document.getElementById('newsPostingSection').scrollIntoView({ behavior: 'smooth' });
     });
     
@@ -418,8 +456,7 @@
       if (user) {
         document.getElementById('newsPostingSection').style.display = 'block';
         document.getElementById('userEmail').textContent = user.email;
-        // A menüben: ha be van jelentkezve, elrejtjük a "Bejelentkezés" gombot,
-        // és megjelenítjük a "Hírírás" és "Kijelentkezés" gombokat.
+        // Ha be van jelentkezve, elrejtjük a "Bejelentkezés" gombot, és megjelenítjük a "Hírírás" és "Kijelentkezés" gombokat.
         document.getElementById('loginLink').style.display = 'none';
         document.getElementById('newsPostLink').style.display = 'inline';
         document.getElementById('signOutLink').style.display = 'inline';
@@ -472,7 +509,7 @@
         title: title,
         content: content,
         imageUrls: imageUrls || null,
-        tags: tags,  // itt mentjük el a tag tömböt
+        tags: tags,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       })
       .then(() => {
@@ -539,6 +576,13 @@
     window.addEventListener('click', (e) => {
       if(e.target === authModal) {
         closeModal();
+      }
+    });
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById('loginLink').style.display = 'none';
+      } else {
+        document.getElementById('loginLink').style.display = 'inline-block';
       }
     });
   </script>
