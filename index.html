@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Craftlandia Online - Főoldal</title>
   <link rel="icon" href="https://static.wixstatic.com/media/568af0_1cfdea1c0f4840ff8cc25028bfc84923~mv2.png" type="image/png">
+  <!-- Google Font: Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome ikonok -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     /* Alap beállítások */
     * {
@@ -17,14 +21,12 @@
       background-color: #1e1e2f;
       color: #f0f0f0;
       line-height: 1.6;
-      text-align: center;
-      padding: 20px;
     }
     footer {
       background: linear-gradient(135deg, #3f3f70, #2c2c50);
       padding: 20px;
       border-top: 3px solid #ffa726;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
       margin-top: 30px;
     }
     footer p {
@@ -38,55 +40,19 @@
     a:hover {
       text-decoration: underline;
     }
-    section {
-      max-width: 800px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      grid-gap: 20px;
-    }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 10px;
-    }
-    p {
-      font-size: 1.1rem;
-      margin-bottom: 20px;
-    }
-    h1#hi {
-      font-size: 2.5rem;
-      font-weight: bold;
-      letter-spacing: 1px;
-      margin-bottom: 10px;
-      color: #ffa726;
-    }
-    p#info {
-      font-size: 1.5rem;
-      margin-bottom: 20px;
-      color: #42ff09;
-    }
-    p#registnow {
-      font-size: 1.5rem;
-      margin-bottom: 20px;
-      color: #ff09e6;
-    }
-    p#loginnow {
-      font-size: 1.5rem;
-      margin-bottom: 20px;
-      color: #ff0909;
-    }
+    
     /* Fejléc és menüsáv */
     header {
       background: linear-gradient(135deg, #3f3f70, #2c2c50);
       padding: 20px;
       border-bottom: 3px solid #ffa726;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-      margin-bottom: 30px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     }
     header h1 {
       font-size: 2.5rem;
       font-weight: bold;
       letter-spacing: 1px;
+      text-align: center;
       margin-bottom: 10px;
     }
     nav {
@@ -98,60 +64,50 @@
       font-size: 1rem;
       padding: 8px 16px;
       border-radius: 4px;
-      background-color: rgba(255,167,38,0.2);
+      background-color: rgba(255, 167, 38, 0.2);
       transition: background-color 0.3s;
     }
     nav a:hover {
-      background-color: rgba(255,167,38,0.4);
+      background-color: rgba(255, 167, 38, 0.4);
     }
-    /* Modal (bejelentkezési ablak) */
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.7);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
+    
+    /* Fő tartalom */
+    main {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
     }
-    .modal-content {
+    
+    /* Szekciók */
+    section {
       background-color: #29293d;
+      margin-bottom: 30px;
       padding: 30px;
       border-radius: 10px;
-      width: 90%;
-      max-width: 400px;
-      position: relative;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
-    .modal-content h2 {
+    section h2 {
+      font-size: 1.8rem;
       margin-bottom: 20px;
+      border-bottom: 2px solid #ffa726;
+      padding-bottom: 10px;
     }
-    .close-modal {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #ffa726;
-    }
+    
     /* Űrlap stílusok */
     form {
       display: flex;
       flex-direction: column;
-      gap: 15px;
     }
-    input {
+    input, textarea {
       padding: 15px;
+      margin-bottom: 20px;
       border: none;
       border-radius: 8px;
       font-size: 16px;
       background-color: #3b3b55;
       color: #fff;
     }
-    input:focus {
+    input:focus, textarea:focus {
       outline: none;
       box-shadow: 0 0 5px 2px #ffa726;
     }
@@ -170,17 +126,115 @@
       background-color: #ffb74d;
       transform: translateY(-2px);
     }
-    /* Google bejelentkezés gomb */
+    
+    /* Modal (bejelentkezési ablak) */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .modal-content {
+      background-color: #29293d;
+      padding: 30px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      position: relative;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+    .modal-content h2 {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .close-modal {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #ffa726;
+    }
+    
+    /* Google bejelentkezés gomb módosítva */
     #googleSignInButton {
       background-color: #aa41ff;
       width: 100%;
       max-width: 400px;
-      margin: 20px 0;
+      margin: 30px 0 20px;
     }
-    #googleSignInButton img {
-      height: 20px;
-      margin-right: 10px;
-      vertical-align: middle;
+    
+    /* Felhasználói státusz (a bejelentkezés után) */
+    #userStatus {
+      text-align: right;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+    #userStatus button {
+      background-color: #e53935;
+      margin-left: 10px;
+    }
+    
+    /* Hír lista */
+    #newsContainer {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-gap: 20px;
+    }
+    .news-item {
+      background-color: #3b3b55;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: transform 0.3s;
+    }
+    .news-item:hover {
+      transform: translateY(-5px);
+    }
+    .news-item h3 {
+      color: #ffa726;
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+    }
+    .news-item p {
+      font-size: 0.95rem;
+      margin-bottom: 15px;
+    }
+    .news-item img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .news-item small {
+      color: #b0b0b0;
+    }
+    
+    /* Tag választó stílusok */
+    fieldset {
+      border: 1px solid #ffa726;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    fieldset legend {
+      padding: 0 5px;
+      font-weight: bold;
+      color: #ffa726;
+    }
+    fieldset label {
+      margin-right: 15px;
+      font-size: 0.95rem;
+      display: inline-block;
+      margin-bottom: 5px;
+    }
+    fieldset input[type="checkbox"] {
+      margin-right: 5px;
     }
   </style>
 </head>
@@ -188,12 +242,20 @@
   <header>
     <h1>Craftlandia Online - Főoldal</h1>
     <nav>
-      <a href="#" id="homeLink">Főoldal</a>
-      <a href="#" id="loginLink">Bejelentkezés</a>
-      <a href="news.html" id="newslink">Hírek</a>
-      <a href="festival.html" id="festivallink">Események</a>
+      <a href="#" id="homeLink"><i class="fas fa-home"></i> Főoldal</a>
+      <a href="#" id="loginLink"><i class="fas fa-sign-in-alt"></i> Bejelentkezés</a>
+      <a href="news.html" id="newslink"><i class="fas fa-newspaper"></i> Hírek</a>
+      <a href="festival.html" id="festivallink"><i class="fas fa-calendar-alt"></i> Események</a>
     </nav>
   </header>
+  
+  <!-- Hero szekció: nagy kép -->
+  <section id="hero" style="background-image: url('https://via.placeholder.com/1500x500'); background-size: cover; background-position: center; height: 500px;">
+    <div class="hero-text">
+      <h2>Üdvözöllek a Craftlandia Online világában!</h2>
+      <p>Merülj el a legfrissebb hírekben, eseményekben és közösségi élményekben!</p>
+    </div>
+  </section>
   
   <!-- Bejelentkezési Modal -->
   <div class="modal" id="authModal">
@@ -227,7 +289,11 @@
     <p id="registnow">Regisztrálj most! Kattints a "Bejelentkezés" gombra, majd a "Regisztráció" részbe!</p>
     <p id="loginnow">Ha már regisztráltál, kérlek jelentkezz be a "Bejelentkezés" gomb segítségével.</p>
   </section>
-  
+
+  <footer>
+    <p>&copy; 2025 Craftlandiai Állam és Craftlandia Online Kft.</p>
+  </footer>
+
   <!-- Firebase SDK-k -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
@@ -262,7 +328,7 @@
           console.error("Bejelentkezési hiba:", error);
         });
     });
-    
+
     // Google bejelentkezés kezelése
     document.getElementById('googleSignInButton').addEventListener('click', function(e) {
       e.preventDefault();
@@ -277,7 +343,7 @@
           console.error("Google bejelentkezési hiba:", error);
         });
     });
-    
+
     // Regisztráció kezelése
     document.getElementById('signup-form').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -314,9 +380,13 @@
         closeModal();
       }
     });
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById('loginLink').style.display = 'none';
+      } else {
+        document.getElementById('loginLink').style.display = 'inline-block';
+      }
+    });
   </script>
 </body>
-<footer>
-  <p>&copy; 2025 Craftlandiai Állam és Craftlandia Online Kft.</p>
-</footer>
 </html>
