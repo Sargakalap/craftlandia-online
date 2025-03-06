@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Craftlandia Online - Főoldal</title>
   <link rel="icon" href="https://static.wixstatic.com/media/568af0_1cfdea1c0f4840ff8cc25028bfc84923~mv2.png" type="image/png">
+  <!-- Google Fonts: Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome ikonok -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     /* Alap beállítások */
     * {
@@ -149,11 +153,11 @@
 </head>
 <body>
   <header>
-    <h1>Craftlandia Online - Főoldal</h1>
+    <h1><i class="fas fa-globe"></i> Craftlandia Online - Főoldal</h1>
     <nav>
-      <a href="index.html" id="homeLink">Főoldal</a>
-      <a href="#" id="loginLink">Bejelentkezés</a>
-      <a href="news.html" id="newslink">Hírek</a>
+      <a href="index.html" id="homeLink"><i class="fas fa-home"></i> Főoldal</a>
+      <a href="#" id="loginLink"><i class="fas fa-sign-in-alt"></i> Bejelentkezés</a>
+      <a href="news.html" id="newslink"><i class="fas fa-newspaper"></i> Hírek</a>
     </nav>
   </header>
   
@@ -164,8 +168,8 @@
       <h2>Bejelentkezés / Regisztráció</h2>
       <!-- Bejelentkezési űrlap -->
       <form id="login-form">
-        <input type="email" id="login-email" placeholder="Email" required>
-        <input type="password" id="login-password" placeholder="Jelszó" required>
+        <input type="email" id="login-email" placeholder="Email 📧" required>
+        <input type="password" id="login-password" placeholder="Jelszó 🔒" required>
         <button type="submit">Bejelentkezés</button>
       </form>
       <!-- Google bejelentkezés gomb -->
@@ -175,27 +179,28 @@
       </button>
       <!-- Regisztrációs űrlap -->
       <form id="signup-form">
-        <input type="email" id="signup-email" placeholder="Email" required>
-        <input type="password" id="signup-password" placeholder="Jelszó" required>
+        <input type="email" id="signup-email" placeholder="Email 📧" required>
+        <input type="password" id="signup-password" placeholder="Jelszó 🔒" required>
         <button type="submit">Regisztráció</button>
       </form>
     </div>
   </div>
   
-  <!-- Tartalom -->
-  <h1>Események</h1>
-  <h2>Bazsi Fest</h2>
-  <p>Következő Bazsi Fest:</p>
-  <p>Kezdődik: 2025.Április.02 18:00</p>
-  <p>Vége: 2025.Április.09 19:00</p>
-  <p>Jegyek: Bazsi City, Polgármesteri Hivatal</p>
-
+  <!-- Tartalom: pl. Események vagy más info -->
+  <main>
+    <h1>Események</h1>
+    <h2>Bazsi Fest</h2>
+    <p><i class="fas fa-info-circle"></i> Következő Bazsi Fest:</p>
+    <p><i class="fas fa-clock"></i> Kezdődik: 2025.Április.02 18:00</p>
+    <p><i class="fas fa-clock"></i> Vége: 2025.Április.09 19:00</p>
+    <p><i class="fas fa-ticket-alt"></i> Jegyek: Bazsi City, Polgármesteri Hivatal</p>
+  </main>
   
   <!-- Firebase SDK-k -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script>
-    // Firebase konfiguráció – cseréld le a saját adataidra!
+    // Firebase konfiguráció – cseréld le a saját adataidra! 🔥
     const firebaseConfig = {
       apiKey: "AIzaSyBfkcNHasJkMJz_mpNczcseQAmfDRV5hUI",
       authDomain: "craftlandia-online.firebaseapp.com",
@@ -268,20 +273,23 @@
       document.getElementById('authModal').style.display = 'flex';
     });
     
-    // Modal bezárása az X-re kattintva
+    // Modal bezárása az X-re kattintva, illetve ha a modal háttérre kattint a felhasználó
     document.getElementById('closeModal').addEventListener('click', closeModal);
-    
-    // Modal bezárása, ha a felhasználó a modal hátterére kattint
-    window.addEventListener('click', function(e) {
+    window.addEventListener('click', (e) => {
       if(e.target === document.getElementById('authModal')) {
         closeModal();
+      }
+    });
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById('loginLink').style.display = 'none';
+      } else {
+        document.getElementById('loginLink').style.display = 'inline-block';
       }
     });
   </script>
 </body>
 <footer>
-  <p>&copy; 2025 Craftlandiai Állam és Craftlandia Online Kft.</p>
+  <p>&copy; 2025 Craftlandiai Állam és Craftlandia Online Kft. </p>
 </footer>
 </html>
-
-
