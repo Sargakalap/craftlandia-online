@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Craftlandia Online - Hírek</title>
+  <title>Craftlandia Online - Főoldal</title>
   <link rel="icon" href="https://static.wixstatic.com/media/568af0_1cfdea1c0f4840ff8cc25028bfc84923~mv2.png" type="image/png">
-  <!-- Google Fonts: Roboto -->
+  <!-- Google Font: Roboto -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <!-- Font Awesome ikonok -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-/* Alap beállítások - továbbfejlesztve */
+   /* Alap beállítások - továbbfejlesztve */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -921,18 +921,23 @@ section {
   </style>
 </head>
 <body>
-
-  
   <header>
-    <h1><i class="fas fa-newspaper"></i> Craftlandia Online - Hírek</h1>
+    <h1>Craftlandia Online - Főoldal</h1>
     <nav>
-      <a href="index.html" id="homeLink"><i class="fas fa-home"></i> Főoldal</a>
+      <a href="#" id="homeLink"><i class="fas fa-home"></i> Főoldal</a>
       <a href="#" id="loginLink"><i class="fas fa-sign-in-alt"></i> Bejelentkezés</a>
-      <a href="#" id="newsPostLink" style="display:none;"><i class="fas fa-edit"></i> Hírírás</a>
-      <a href="#" id="signOutLink" style="display:none;"><i class="fas fa-sign-out-alt"></i> Kijelentkezés</a>
-      <a href="festival.html" id="festivalslink"><i class="fas fa-calendar-alt"></i> Események</a>
+      <a href="news.html" id="newslink"><i class="fas fa-newspaper"></i> Hírek</a>
+      <a href="festival.html" id="festivallink"><i class="fas fa-calendar-alt"></i> Események</a>
     </nav>
   </header>
+  
+  <!-- Hero szekció: nagy kép -->
+  <section id="hero" style="background-image: url('https://via.placeholder.com/1500x500'); background-size: cover; background-position: center; height: 500px;">
+    <div class="hero-text">
+      <h2>Üdvözöllek a Craftlandia Online világában!</h2>
+      <p>Merülj el a legfrissebb hírekben, eseményekben és közösségi élményekben!</p>
+    </div>
+  </section>
   
   <!-- Bejelentkezési Modal -->
   <div class="modal" id="authModal">
@@ -947,8 +952,7 @@ section {
       </form>
       <!-- Google bejelentkezés gomb -->
       <button id="googleSignInButton">
-        <i class="fab fa-google"></i>
-        Google bejelentkezés
+        <i class="fab fa-google"></i> Google bejelentkezés
       </button>
       <!-- Regisztrációs űrlap -->
       <form id="signup-form">
@@ -959,52 +963,21 @@ section {
     </div>
   </div>
   
-  <main>
-    <!-- Új hír közzététele (csak bejelentkezett felhasználóknak) -->
-    <section id="newsPostingSection" style="display: none;">
-      <div id="userStatus">
-        Bejelentkezve: <span id="userEmail"></span>
-        <button id="signOutButton">Kijelentkezés</button>
-      </div>
-      <h2><i class="fas fa-upload"></i> Új hír közzététele</h2>
-      <form id="newsForm">
-        <label for="title">Cím:</label>
-        <input type="text" id="title" name="title" required>
-        <label for="content">Tartalom:</label>
-        <textarea id="content" name="content" required></textarea>
-        <!-- Tag választó rész -->
-        <fieldset>
-          <legend>Válaszd ki a tageket:</legend>
-          <label><input type="checkbox" name="tags" value="Politika">Politika</label>
-          <label><input type="checkbox" name="tags" value="Ország">Ország</label>
-          <label><input type="checkbox" name="tags" value="Tech">Tech</label>
-          <label><input type="checkbox" name="tags" value="Tudomány">Tudomány</label>
-          <label><input type="checkbox" name="tags" value="Élet">Élet</label>
-          <label><input type="checkbox" name="tags" value="FONTOS">FONTOS</label>
-          <label><input type="checkbox" name="tags" value="Járművek">Járművek</label>
-          <label><input type="checkbox" name="tags" value="Külföld">Külföld</label>
-          <label><input type="checkbox" name="tags" value="Bazsi City">Bazsi City</label>
-          <label><input type="checkbox" name="tags" value="Bazsi Fest">Bazsi Fest</label>
-          <label><input type="checkbox" name="tags" value="Reklám">Reklám</label>
-        </fieldset>
-        <label for="image">Képek feltöltése:</label>
-        <input type="file" id="image" name="image" accept="image/*" multiple>
-        <button type="submit">Hír közzététele</button>
-      </form>
-    </section>
-    
-    <!-- Legújabb hírek listája -->
-    <section id="newsList">
-      <h2><i class="fas fa-bolt"></i> Legújabb hírek</h2>
-      <div id="newsContainer"></div>
-    </section>
-  </main>
-  
+  <!-- Tartalom -->
+  <section>
+    <h1 id="hi">Üdvözöllek a Craftlandia Online oldalán!</h1>
+    <p id="info">A Craftlandia Online Craftlandia okos weboldala, ahol a legfrissebb híreket láthatod!</p>
+    <p id="registnow">Regisztrálj most! Kattints a "Bejelentkezés" gombra, majd a "Regisztráció" részbe!</p>
+    <p id="loginnow">Ha már regisztráltál, kérlek jelentkezz be a "Bejelentkezés" gomb segítségével.</p>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Craftlandiai Állam és Craftlandia Online Kft.</p>
+  </footer>
+
   <!-- Firebase SDK-k -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
   <script>
     // Firebase konfiguráció – cseréld le a saját adataidra!
     const firebaseConfig = {
@@ -1019,27 +992,23 @@ section {
     
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
     
-    /* 🔥 Autentikációs funkciók 🔥 */
-    // Regisztráció
-    document.getElementById('signup-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const email = document.getElementById('signup-email').value;
-      const password = document.getElementById('signup-password').value;
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(() => {
-          alert("Sikeres regisztráció! 🎉");
-          document.getElementById('signup-form').reset();
-        })
-        .catch((error) => {
-          alert("Hiba: " + error.message + " 😬");
-          console.error("Regisztrációs hiba:", error);
-        <!-- Removed the dangling or misplaced closing brace -->
-    });
+    // Modal kezelő függvények
+    function openModal() {
+      document.getElementById('authModal').style.display = 'flex';
+      setTimeout(() => {
+        document.getElementById('authModal').classList.add('active');
+      }, 10);
+    }
     
-    // Bejelentkezés
+    function closeModal() {
+      document.getElementById('authModal').classList.remove('active');
+      setTimeout(() => {
+        document.getElementById('authModal').style.display = 'none';
+      }, 300);
+    }
+    
+    // Bejelentkezési űrlap kezelése
     document.getElementById('login-form').addEventListener('submit', function(e) {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
@@ -1051,12 +1020,12 @@ section {
           closeModal();
         })
         .catch((error) => {
-          alert("Hiba: " + error.message + " 😬");
+          alert("Hiba: lehet hogy rossz email vagy jelszó, esetleg google bejelentkezés kell! ");
           console.error("Bejelentkezési hiba:", error);
         });
     });
-    
-    // Google bejelentkezés
+
+    // Google bejelentkezés kezelése
     document.getElementById('googleSignInButton').addEventListener('click', function(e) {
       e.preventDefault();
       const provider = new firebase.auth.GoogleAuthProvider();
@@ -1070,145 +1039,25 @@ section {
           console.error("Google bejelentkezési hiba:", error);
         });
     });
-    
-    // Kijelentkezés
-    document.getElementById('signOutButton').addEventListener('click', function() {
-      auth.signOut()
+
+    // Regisztráció kezelése
+    document.getElementById('signup-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+      auth.createUserWithEmailAndPassword(email, password)
         .then(() => {
-          alert("Sikeres kijelentkezés! 👋");
+          alert("Sikeres regisztráció! 🎉");
+          document.getElementById('signup-form').reset();
         })
         .catch((error) => {
-          console.error("Kijelentkezési hiba:", error);
+          alert("Hiba: " + error.message + " 😬");
+          console.error("Regisztrációs hiba:", error);
         });
     });
     
-    // A menüsávon is legyen a kijelentkezés gomb (dinamikusan kezelt)
-    document.getElementById('signOutLink').addEventListener('click', function(e) {
-      e.preventDefault();
-      auth.signOut()
-        .then(() => {
-          alert("Sikeres kijelentkezés! 👋");
-        })
-        .catch((error) => {
-          console.error("Kijelentkezési hiba:", error);
-        });
-    });
-    
-    // A "Hírírás" gomb navigáció (görgetés a posztoló részhez)
-    document.getElementById('newsPostLink').addEventListener('click', function(e) {
-      e.preventDefault();
-      document.getElementById('newsPostingSection').scrollIntoView({ behavior: 'smooth' });
-    });
-    
-    // Autentikációs állapot figyelése
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById('newsPostingSection').style.display = 'block';
-        document.getElementById('userEmail').textContent = user.email;
-        // Ha be van jelentkezve, elrejtjük a "Bejelentkezés" gombot, és megjelenítjük a "Hírírás" és "Kijelentkezés" gombokat.
-        document.getElementById('loginLink').style.display = 'none';
-        document.getElementById('newsPostLink').style.display = 'inline';
-        document.getElementById('signOutLink').style.display = 'inline';
-      } else {
-        document.getElementById('newsPostingSection').style.display = 'none';
-        document.getElementById('loginLink').style.display = 'inline';
-        document.getElementById('newsPostLink').style.display = 'none';
-        document.getElementById('signOutLink').style.display = 'none';
-      }
-    });
-    
-    /* 🚀 Hír közzététele és kép feltöltés 🚀 */
-    document.getElementById('newsForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const title = document.getElementById('title').value;
-      const content = document.getElementById('content').value;
-      const imageFiles = document.getElementById('image').files;
-      
-      // Gyűjtsd össze a kiválasztott tageket
-      const tagCheckboxes = document.querySelectorAll('input[name="tags"]:checked');
-      const tags = Array.from(tagCheckboxes).map(cb => cb.value);
-    
-      if (title && content) {
-        if (imageFiles.length > 0) {
-          const uploadPromises = [];
-          const imageUrls = [];
-          for (let i = 0; i < imageFiles.length; i++) {
-            const file = imageFiles[i];
-            const storageRef = storage.ref('news-images/' + Date.now() + '_' + file.name);
-            const uploadTask = storageRef.put(file)
-              .then(snapshot => snapshot.ref.getDownloadURL())
-              .then(url => { imageUrls.push(url); })
-              .catch(error => {
-                console.error("❌ Hiba a kép feltöltésekor: ", error);
-                alert("Hiba történt a kép feltöltésénél! 😬");
-              });
-            uploadPromises.push(uploadTask);
-          }
-          Promise.all(uploadPromises).then(() => { saveNews(title, content, imageUrls, tags); });
-        } else {
-          saveNews(title, content, null, tags);
-        }
-      } else {
-        alert("⚠️ Töltsd ki a cím és a tartalom mezőt!");
-      }
-    });
-    
-    function saveNews(title, content, imageUrls, tags) {
-      db.collection("news").add({
-        title: title,
-        content: content,
-        imageUrls: imageUrls || null,
-        tags: tags,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      })
-      .then(() => {
-        alert("✅ Hír sikeresen közzétéve!");
-        document.getElementById('newsForm').reset();
-        loadNews();
-      })
-      .catch(error => {
-        console.error("❌ Hiba történt a mentéskor: ", error);
-        alert("Hiba történt a közzétételnél! Nézd meg a konzolt. 😬");
-      });
-    }
-    
-    function loadNews() {
-      db.collection("news").orderBy("timestamp", "desc").get()
-        .then(querySnapshot => {
-          const newsContainer = document.getElementById('newsContainer');
-          newsContainer.innerHTML = "";
-          querySnapshot.forEach(doc => {
-            const newsData = doc.data();
-            const newsItem = document.createElement('div');
-            newsItem.classList.add('news-item');
-            const time = newsData.timestamp ? new Date(newsData.timestamp.seconds * 1000).toLocaleString() : '';
-            let imagesHtml = "";
-            if (newsData.imageUrls && Array.isArray(newsData.imageUrls)) {
-              newsData.imageUrls.forEach(url => { imagesHtml += `<img src="${url}" alt="Hír képe">`; });
-            }
-            let tagsHtml = "";
-            if (newsData.tags && newsData.tags.length > 0) {
-              tagsHtml = `<p><strong>Tagek:</strong> ${newsData.tags.join(', ')}</p>`;
-            }
-            newsItem.innerHTML = `
-              <h3>${newsData.title}</h3>
-              <p>${newsData.content}</p>
-              ${imagesHtml}
-              ${tagsHtml}
-              <small>${time}</small>
-            `;
-            newsContainer.appendChild(newsItem);
-          });
-        })
-        .catch(error => {
-          console.error("❌ Hiba a hírek betöltésekor: ", error);
-        });
-    }
-    
-    window.onload = loadNews;
-    
-        // Modal megnyitása a "Bejelentkezés" linkre kattintva
-        document.getElementById('loginLink').addEventListener('click', function(e) {
+    // Modal megnyitása a "Bejelentkezés" linkre kattintva
+    document.getElementById('loginLink').addEventListener('click', function(e) {
       e.preventDefault();
       openModal();
     });
@@ -1240,14 +1089,6 @@ section {
         document.getElementById('loginLink').style.display = 'inline-block';
       }
     });
-     // Modal funkcionalitás
-     function openModal() {
-      document.getElementById('authModal').classList.add('active');
-    }
-    
-    function closeModal() {
-      document.getElementById('authModal').classList.remove('active');
-    }
         // Téma kezelő JavaScript
 document.addEventListener('DOMContentLoaded', function() {
   // Ellenőrizzük a rendszer sötét mód beállítását
@@ -1308,8 +1149,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
- // Cookie banner megjelenítése, ha még nem fogadták el
- const cookieBanner = document.querySelector('.cookie-banner');
+document.addEventListener('DOMContentLoaded', function() {
+  // Cookie banner megjelenítése, ha még nem fogadták el
+  const cookieBanner = document.querySelector('.cookie-banner');
   const acceptAllBtn = document.querySelectorAll('.accept-all');
   const rejectAllBtn = document.querySelector('.reject-all');
   const customizeBtn = document.querySelector('.customize');
@@ -1471,7 +1313,7 @@ function createCookieSettingsLink() {
 // Süti menüpont létrehozása betöltéskor
 document.addEventListener('DOMContentLoaded', createCookieSettingsLink);
   </script>
-   <div class="cookie-banner">
+  <div class="cookie-banner">
     <div class="cookie-content">
       <div class="cookie-icon">
         <i class="fas fa-cookie-bite"></i>
@@ -1524,7 +1366,4 @@ document.addEventListener('DOMContentLoaded', createCookieSettingsLink);
     </div>
   </div>
 </body>
-<footer>
-  <p>&copy; 2025 Craftlandiai Állam és Craftlandia Online Kft.</p>
-</footer>
 </html>
