@@ -743,6 +743,181 @@ section {
   opacity: 1;
   visibility: visible;
 }
+.cookie-banner {
+  position: fixed;
+  bottom: -100%;
+  left: 0;
+  right: 0;
+  background-color: var(--bg-medium);
+  color: var(--text-primary);
+  padding: 20px;
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-top: 3px solid var(--primary-color);
+  transition: bottom 0.5s ease-in-out;
+}
+
+.cookie-banner.active {
+  bottom: 0;
+}
+
+.cookie-banner .cookie-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.cookie-banner .cookie-text {
+  flex: 1;
+  min-width: 300px;
+}
+
+.cookie-banner h3 {
+  margin-bottom: 10px;
+  color: var(--primary-color);
+  font-size: 1.4rem;
+}
+
+.cookie-banner p {
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.cookie-banner .cookie-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.cookie-banner button {
+  min-width: 120px;
+  padding: 12px 20px;
+}
+
+.cookie-banner .accept-all {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+}
+
+.cookie-banner .reject-all {
+  background: transparent;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.cookie-banner .customize {
+  background: transparent;
+  border: 2px solid var(--text-secondary);
+  color: var(--text-secondary);
+}
+
+.cookie-banner .cookie-icon {
+  font-size: 2rem;
+  margin-right: 15px;
+  color: var(--primary-color);
+}
+
+.cookie-advanced {
+  display: none;
+  width: 100%;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--text-secondary);
+}
+
+.cookie-advanced.active {
+  display: block;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.cookie-advanced .cookie-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.cookie-option {
+  background-color: var(--bg-light);
+  padding: 15px;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+}
+
+.cookie-option label {
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  cursor: pointer;
+}
+
+.cookie-option .toggle {
+  position: relative;
+  width: 40px;
+  height: 20px;
+  background-color: var(--text-secondary);
+  border-radius: 20px;
+  transition: var(--transition-fast);
+}
+
+.cookie-option .toggle::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: var(--bg-light);
+  top: 2px;
+  left: 2px;
+  transition: var(--transition-fast);
+}
+
+.cookie-option input[type="checkbox"] {
+  display: none;
+}
+
+.cookie-option input[type="checkbox"]:checked + .toggle {
+  background-color: var(--primary-color);
+}
+
+.cookie-option input[type="checkbox"]:checked + .toggle::after {
+  left: 22px;
+}
+
+.cookie-option .essential {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Reszponzív beállítások */
+@media (max-width: 768px) {
+  .cookie-banner .cookie-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .cookie-banner .cookie-text {
+    min-width: unset;
+  }
+  
+  .cookie-banner .cookie-icon {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+}
   </style>
 </head>
 <body>
@@ -974,6 +1149,221 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
+document.addEventListener('DOMContentLoaded', function() {
+  // Cookie banner megjelenítése, ha még nem fogadták el
+  const cookieBanner = document.querySelector('.cookie-banner');
+  const acceptAllBtn = document.querySelectorAll('.accept-all');
+  const rejectAllBtn = document.querySelector('.reject-all');
+  const customizeBtn = document.querySelector('.customize');
+  const cookieAdvanced = document.querySelector('.cookie-advanced');
+  
+  // Ellenőrizzük, hogy el lett-e már fogadva a cookie policy
+  const cookiesAccepted = localStorage.getItem('cookiesAccepted');
+  
+  // Ha még nem volt elfogadva, megjelenítjük a bannert
+  if (!cookiesAccepted) {
+    setTimeout(() => {
+      cookieBanner.classList.add('active');
+    }, 1000); // 1 másodperc késleltetés után jelenik meg
+  }
+  
+  // Összes elfogadása gomb eseménykezelő
+  acceptAllBtn.forEach(btn => {
+    btn.addEventListener('click', function() {
+      acceptAllCookies();
+      cookieBanner.classList.remove('active');
+    });
+  });
+  
+  // Elutasítás gomb eseménykezelő
+  rejectAllBtn.addEventListener('click', function() {
+    rejectAllCookies();
+    cookieBanner.classList.remove('active');
+  });
+  
+  // Testreszabás gomb eseménykezelő
+  customizeBtn.addEventListener('click', function() {
+    cookieAdvanced.classList.toggle('active');
+  });
+  
+  // Cookie kezelés függvények
+  function acceptAllCookies() {
+    // Beállítjuk az összes cookie preferenciát true-ra
+    setCookiePreferences({
+      essential: true,
+      analytics: true,
+      marketing: true,
+      preference: true
+    });
+    
+    // Elmentjük, hogy el lett fogadva
+    localStorage.setItem('cookiesAccepted', 'true');
+  }
+  
+  function rejectAllCookies() {
+    // Csak a feltétlenül szükséges sütiket engedélyezzük
+    setCookiePreferences({
+      essential: true,
+      analytics: false,
+      marketing: false,
+      preference: false
+    });
+    
+    // Elmentjük, hogy el lett utasítva (csak a szükségesek)
+    localStorage.setItem('cookiesAccepted', 'minimal');
+  }
+  
+  function setCookiePreferences(preferences) {
+    // Elmentjük a cookie preferenciákat
+    localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
+    
+    // Ide jöhet a különböző típusú sütik tényleges beállítása/törlése
+    // Például:
+    if (!preferences.analytics) {
+      // Analitikai sütik törlése
+      deleteCookiesByType('analytics');
+    }
+    
+    if (!preferences.marketing) {
+      // Marketing sütik törlése
+      deleteCookiesByType('marketing');
+    }
+    
+    if (!preferences.preference) {
+      // Preferencia sütik törlése
+      deleteCookiesByType('preference');
+    }
+  }
+  
+  // Sütik törlése típus szerint
+  function deleteCookiesByType(type) {
+    // Itt törölheted a különböző típusú sütiket
+    // Példa: analytical_cookie, _ga, _gid, stb.
+    const cookiesToDelete = {
+      'analytics': ['_ga', '_gid', '_gat', 'analytical_cookie'],
+      'marketing': ['marketing_cookie', 'ad_cookie'],
+      'preference': ['preference_cookie', 'theme_pref']
+    };
+    
+    if (cookiesToDelete[type]) {
+      cookiesToDelete[type].forEach(cookie => {
+        document.cookie = `${cookie}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      });
+    }
+  }
+  
+  // Cookie preferenciák betöltése a form-ba
+  function loadCookiePreferences() {
+    const savedPreferences = localStorage.getItem('cookiePreferences');
+    
+    if (savedPreferences) {
+      const preferences = JSON.parse(savedPreferences);
+      
+      // Checkboxok beállítása
+      document.getElementById('analytics-cookies').checked = preferences.analytics;
+      document.getElementById('marketing-cookies').checked = preferences.marketing;
+      document.getElementById('preference-cookies').checked = preferences.preference;
+    }
+  }
+  
+  // Preferenciák betöltése
+  loadCookiePreferences();
+  
+  // Elmentjük a testreszabott beállításokat
+  document.querySelector('.cookie-advanced .accept-all').addEventListener('click', function() {
+    const preferences = {
+      essential: true, // Mindig engedélyezve
+      analytics: document.getElementById('analytics-cookies').checked,
+      marketing: document.getElementById('marketing-cookies').checked,
+      preference: document.getElementById('preference-cookies').checked
+    };
+    
+    setCookiePreferences(preferences);
+    localStorage.setItem('cookiesAccepted', 'customized');
+    cookieBanner.classList.remove('active');
+  });
+});
+
+// Süti menüpont létrehozása a láblécben
+function createCookieSettingsLink() {
+  const footerLinks = document.querySelector('.footer-section ul');
+  
+  if (footerLinks) {
+    const cookieSettingsItem = document.createElement('li');
+    const cookieSettingsLink = document.createElement('a');
+    cookieSettingsLink.href = '#';
+    cookieSettingsLink.textContent = 'Süti beállítások';
+    cookieSettingsLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelector('.cookie-banner').classList.add('active');
+      document.querySelector('.cookie-advanced').classList.add('active');
+    });
+    
+    cookieSettingsItem.appendChild(cookieSettingsLink);
+    
+    // A legbiztosabb módszer: az első elem elé szúrja be
+    const firstChild = footerLinks.firstChild;
+    footerLinks.insertBefore(cookieSettingsItem, firstChild);
+    
+    // Vagy alternatívaként:
+    footerLinks.prepend(cookieSettingsItem); // modernebb módszer, de nem minden böngésző támogatja
+  }
+}
+
+// Süti menüpont létrehozása betöltéskor
+document.addEventListener('DOMContentLoaded', createCookieSettingsLink);
   </script>
+  <div class="cookie-banner">
+    <div class="cookie-content">
+      <div class="cookie-icon">
+        <i class="fas fa-cookie-bite"></i>
+      </div>
+      <div class="cookie-text">
+        <h3>Sütiket használunk</h3>
+        <p>Az oldal sütiket (cookie-kat) használ a felhasználói élmény javítása és a weboldal működésének biztosítása érdekében. A weboldalunk használatával elfogadod a sütiket a jelenlegi beállításoknak megfelelően.</p>
+      </div>
+      <div class="cookie-buttons">
+        <button class="accept-all">Összes elfogadása</button>
+        <button class="customize">Testreszabás</button>
+        <button class="reject-all">Elutasítás</button>
+      </div>
+    </div>
+    
+    <div class="cookie-advanced">
+      <div class="cookie-options">
+        <div class="cookie-option">
+          <label>
+            Feltétlenül szükséges sütik
+            <input type="checkbox" checked disabled>
+            <span class="toggle essential"></span>
+          </label>
+        </div>
+        <div class="cookie-option">
+          <label>
+            Analitikai sütik
+            <input type="checkbox" id="analytics-cookies">
+            <span class="toggle"></span>
+          </label>
+        </div>
+        <div class="cookie-option">
+          <label>
+            Marketing sütik
+            <input type="checkbox" id="marketing-cookies">
+            <span class="toggle"></span>
+          </label>
+        </div>
+        <div class="cookie-option">
+          <label>
+            Preferencia sütik
+            <input type="checkbox" id="preference-cookies">
+            <span class="toggle"></span>
+          </label>
+        </div>
+      </div>
+      <div class="cookie-buttons">
+        <button class="accept-all">Beállítások mentése</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
