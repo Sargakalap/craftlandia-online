@@ -952,6 +952,11 @@ section {
       <form id="signup-form">
         <input type="email" id="signup-email" placeholder="Email " required>
         <input type="password" id="signup-password" placeholder="Jelszó " required>
+        <label>
+          <input type="checkbox" id="feltetel">
+          Elfogadom az <a href="privacypolicy.html">Adatvédelmi szabályzatot</a> és a <a href="terms.html">Felhasználási feltételeket</a><p class="csillag">*</p>
+          </a>
+        </label>
         <button type="submit">Regisztráció</button>
       </form>
     </div>
@@ -999,8 +1004,6 @@ section {
         .catch((error) => {
           alert("Hiba: " + error.message + " 😬");
           console.error("Bejelentkezési hiba:", error);
-    });
-    
     // Google bejelentkezés kezelése
     document.getElementById('googleSignInButton').addEventListener('click', function(e) {
       e.preventDefault();
@@ -1014,6 +1017,7 @@ section {
           alert("Hiba a Google bejelentkezéskor: " + error.message + " 😬");
           console.error("Google bejelentkezési hiba:", error);
         });
+      });
     });
     
     // Regisztráció kezelése
@@ -1116,9 +1120,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-  
-  // Figyelő a rendszer téma változására
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
     // Csak akkor változtatunk, ha nincs egyéni téma beállítva
     if (!localStorage.getItem('theme')) {
       if (event.matches) {
@@ -1265,8 +1266,6 @@ document.addEventListener('DOMContentLoaded', function() {
     localStorage.setItem('cookiesAccepted', 'customized');
     cookieBanner.classList.remove('active');
   });
-});
-
 // Süti menüpont létrehozása a láblécben
 function createCookieSettingsLink() {
   const footerLinks = document.querySelector('.footer-section ul');
@@ -1350,7 +1349,8 @@ document.addEventListener('DOMContentLoaded', createCookieSettingsLink);
   </div>
 </body>
 <footer>
-  <p>&copy; 2025 Craftlandiai Állam és Craftlandia Online Kft. </p>
+  <p>&copy; 2025 Craftlandiai Állam és Craftlandia Online Kft.</p>
+  <p><a href="privacypolicy.html">Adatvédelmi szabályzat</a></p>
+  <p><a href="terms.html">Felhasználási feltételek</a></p>
 </footer>
 </html>
-
