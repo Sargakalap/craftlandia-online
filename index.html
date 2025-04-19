@@ -918,6 +918,11 @@ section {
     margin-bottom: 10px;
   }
 }
+.csillag {
+  color: var(--danger-color);
+  font-size: 1.2rem;
+  margin-left: 5px;
+}
   </style>
 </head>
 <body>
@@ -958,6 +963,11 @@ section {
       <form id="signup-form">
         <input type="email" id="signup-email" placeholder="Email" required>
         <input type="password" id="signup-password" placeholder="Jelszó" required>
+        <label>
+          <input type="checkbox" id="feltetel">
+          Elfogadom az <a href="privacypolicy.html">Adatvédelmi szabályzatot</a> és a <a href="terms.html">Felhasználási feltételeket</a><p class="csillag">*</p>
+          </a>
+        </label>
         <button type="submit">Regisztráció</button>
       </form>
     </div>
@@ -972,7 +982,9 @@ section {
   </section>
 
   <footer>
-    <p>&copy; 2025 Craftlandiai Állam és Craftlandia Online Kft.</p>
+    <p>&copy; 2025 Craftlandiai Állam és Craftlandia Online Kft. </p>
+    <p><a href="privacypolicy.html">Adatvédelmi szabályzat</a></p>
+  <p><a href="terms.html">Felhasználási feltételek</a></p>
   </footer>
 
   <!-- Firebase SDK-k -->
