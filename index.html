@@ -8,7 +8,7 @@
   <!-- Google Font: Roboto -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <!-- Font Awesome ikonok -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://kit.fontawesome.com/cb39f926e0.js" crossorigin="anonymous"></script>
   <style>
    /* Alap beállítások - továbbfejlesztve */
 * {
@@ -985,12 +985,73 @@ section {
     <p>&copy; 2025 Craftlandiai Állam és Craftlandia Online Kft. </p>
     <p><a href="privacypolicy.html">Adatvédelmi szabályzat</a></p>
   <p><a href="terms.html">Felhasználási feltételek</a></p>
+  <a href="https://discord.com/invite/cTBkxTgZp8"><i class="fa-brands fa-discord"></i></a>
   </footer>
 
   <!-- Firebase SDK-k -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
   <script>
+                   // Téma kezelő JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+  // Ellenőrizzük a rendszer sötét mód beállítását
+  const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  
+  // Ellenőrizzük, hogy van-e mentett téma beállítás a localStorage-ban
+  const savedTheme = localStorage.getItem('theme');
+  
+  // Beállítjuk a témát a mentett beállítás vagy a rendszerbeállítás alapján
+  if (savedTheme === 'light') {
+    document.body.classList.add('light-theme');
+    document.body.classList.remove('dark-theme');
+  } else if (savedTheme === 'dark') {
+    document.body.classList.add('dark-theme');
+    document.body.classList.remove('light-theme');
+  } else if (prefersDarkMode) {
+    document.body.classList.add('dark-theme');
+  } else {
+    document.body.classList.add('light-theme');
+  }
+  
+  // Témaváltó gomb hozzáadása, ha még nem létezik
+  if (!document.querySelector('.theme-toggle')) {
+    const themeToggle = document.createElement('div');
+    themeToggle.className = 'theme-toggle';
+    themeToggle.innerHTML = '<i class="' + (document.body.classList.contains('dark-theme') ? 'fas fa-sun' : 'fas fa-moon') + '"></i>';
+    document.body.appendChild(themeToggle);
+    
+    // Témaváltó gomb eseménykezelő
+    themeToggle.addEventListener('click', function() {
+      if (document.body.classList.contains('dark-theme')) {
+        document.body.classList.remove('dark-theme');
+        document.body.classList.add('light-theme');
+        this.innerHTML = '<i class="fas fa-moon"></i>';
+        localStorage.setItem('theme', 'light');
+      } else {
+        document.body.classList.remove('light-theme');
+        document.body.classList.add('dark-theme');
+        this.innerHTML = '<i class="fas fa-sun"></i>';
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+  }
+  
+  // Figyelő a rendszer téma változására
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+    // Csak akkor változtatunk, ha nincs egyéni téma beállítva
+    if (!localStorage.getItem('theme')) {
+      if (event.matches) {
+        document.body.classList.add('dark-theme');
+        document.body.classList.remove('light-theme');
+        document.querySelector('.theme-toggle').innerHTML = '<i class="fas fa-sun"></i>';
+      } else {
+        document.body.classList.add('light-theme');
+        document.body.classList.remove('dark-theme');
+        document.querySelector('.theme-toggle').innerHTML = '<i class="fas fa-moon"></i>';
+      }
+    }
+  });
+});
     // Firebase konfiguráció – cseréld le a saját adataidra!
     const firebaseConfig = {
       apiKey: "AIzaSyBfkcNHasJkMJz_mpNczcseQAmfDRV5hUI",
@@ -1324,6 +1385,8 @@ function createCookieSettingsLink() {
 
 // Süti menüpont létrehozása betöltéskor
 document.addEventListener('DOMContentLoaded', createCookieSettingsLink);
+
+
   </script>
   <div class="cookie-banner">
     <div class="cookie-content">
@@ -1377,5 +1440,53 @@ document.addEventListener('DOMContentLoaded', createCookieSettingsLink);
       </div>
     </div>
   </div>
+  <script>
+    // Működő confetti - egyszerű verzió
+console.log("Confetti script betöltve");
+
+// Egyszerű teszt funkció
+function fireConfetti() {
+  try {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+
+    });
+    console.log("Confetti kilőve!");
+  } catch (error) {
+    console.error("Confetti hiba:", error);
+  }
+}
+
+// Gombokra hover és click
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(() => {
+    const buttons = document.querySelectorAll('button');
+    console.log("Talált gombok:", buttons.length);
+    
+    buttons.forEach((button, index) => {
+      console.log(`Gomb ${index}:`, button.textContent);
+      
+      // Hover event
+      button.addEventListener('mouseenter', fireConfetti);
+      
+      // Click event is
+      button.addEventListener('click', fireConfetti);
+    });
+  }, 500);
+});
+
+// Teszt - Space billentyűre is lőjön confetti
+document.addEventListener('keydown', function(e) {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    fireConfetti();
+    console.log("Space lenyomva - confetti!");
+  }
+});
+
+console.log("Script vége");
+  </script>
 </body>
 </html>
