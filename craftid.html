@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Ügyintéző Portál</title>
+    <!-- Firebase v9 SDK -->
+    <script type="module">
+        // Firebase modular SDK importálása
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, query, where, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+
+        // ⚠️ CSERÉLJE KI A SAJÁT FIREBASE KONFIGURÁCIÓJÁRA! ⚠️
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY_HERE",
+            authDomain: "your-project.firebaseapp.com",
+            projectId: "your-project-id",
+            storageBucket: "your-project.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "your-app-id"
+        };
+
+        // Firebase inicializálása
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Globális változók
+        let currentUser = null;
+        let unsubscribeApplications = null;
+
+        // Admin felhasználók listája (Firestore-ban külön collection-ben tárolható)
+        const adminEmails = ['admin@ugy.hu', 'your-admin@email.com'];
+
+        // Auth státusz változás figyelése
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = {
+                    uid: user.uid,
+                    email: user.email,
+                    isAdmin: adminEmails.includes(user.email)
+                };
+                showMainSection();
+                setupRealtimeListeners();
+            } else {
+                currentUser = null;
+                showLoginSection();
+                cleanupListeners();
+            }
+        });
+
+        // Bejelentkezés
+        window.login = async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                showNotification('Kérem, töltse ki az összes mezőt!', 'error');
+                return;
+            }
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showNotification('Sikeres bejelentkezés!', 'success');
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification(getFirebaseErrorMessage(error), 'error');
+            }
+        };
+
+        // Regisztráció
+        window.register = async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                showNotification('Kérem, töltse ki az összes mezőt!', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showNotification('A jelszónak legalább 6 karakter hosszúnak kell lennie!', 'error');
+                return;
+            }
+
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                showNotification('Sikeres regisztráció!', 'success');
+            } catch (error) {
+                console.error('Register error:', error);
+                showNotification(getFirebaseErrorMessage(error), 'error');
+            }
+        };
+
+        // Kijelentkezés
+        window.logout = async () => {
+            try {
+                await signOut(auth);
+                showNotification('Sikeres kijelentkezés!', 'success');
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+            } catch (error) {
+                console.error('Logout error:', error);
+                showNotification('Kijelentkezési hiba!', 'error');
+            }
+        };
+
+        // Kérelem beküldése Firestore-ba
+        window.submitApplication = async (serviceType) => {
+            if (!currentUser) {
+                showNotification('Kérem, jelentkezzen be először!', 'error');
+                return;
+            }
+
+            const applicationData = {
+                type: serviceType,
+                title: getServiceTitle(serviceType),
+                status: 'pending',
+                createdAt: new Date(),
+                userId: currentUser.uid,
+                userEmail: currentUser.email,
+                data: {}
+            };
+
+            // Adatok gyűjtése az űrlapból
+            const modal = document.getElementById('modalBody');
+            const inputs = modal.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (input.id && input.value) {
+                    applicationData.data[input.id] = input.value;
+                }
+            });
+
+            try {
+                const docRef = await addDoc(collection(db, 'applications'), applicationData);
+                console.log('Application added with ID: ', docRef.id);
+                
+                closeModal();
+                showNotification('Kérelem sikeresen beküldve!', 'success');
+            } catch (error) {
+                console.error('Error adding application: ', error);
+                showNotification('Hiba a kérelem beküldése során!', 'error');
+            }
+        };
+
+        // Admin státusz frissítés
+        window.updateApplicationStatus = async (applicationId, newStatus) => {
+            if (!currentUser || !currentUser.isAdmin) {
+                showNotification('Nincs jogosultsága a művelethez!', 'error');
+                return;
+            }
+
+            try {
+                const appRef = doc(db, 'applications', applicationId);
+                await updateDoc(appRef, {
+                    status: newStatus,
+                    updatedAt: new Date(),
+                    updatedBy: currentUser.email
+                });
+                
+                showNotification('Státusz sikeresen frissítve!', 'success');
+            } catch (error) {
+                console.error('Error updating status: ', error);
+                showNotification('Hiba a státusz frissítése során!', 'error');
+            }
+        };
+
+        // Valós idejű figyelők beállítása
+        function setupRealtimeListeners() {
+            // Felhasználó saját kérelmei
+            const userQuery = query(
+                collection(db, 'applications'),
+                where('userId', '==', currentUser.uid),
+                orderBy('createdAt', 'desc')
+            );
+
+            onSnapshot(userQuery, (snapshot) => {
+                const userApplications = [];
+                snapshot.forEach((doc) => {
+                    userApplications.push({ id: doc.id, ...doc.data() });
+                });
+                displayUserApplications(userApplications);
+                updateStats(userApplications);
+            });
+
+            // Admin számára az összes kérelem
+            if (currentUser.isAdmin) {
+                const adminQuery = query(
+                    collection(db, 'applications'),
+                    orderBy('createdAt', 'desc')
+                );
+
+                onSnapshot(adminQuery, (snapshot) => {
+                    const allApplications = [];
+                    snapshot.forEach((doc) => {
+                        allApplications.push({ id: doc.id, ...doc.data() });
+                    });
+                    displayAdminApplications(allApplications);
+                });
+            }
+        }
+
+        // Figyelők törlése
+        function cleanupListeners() {
+            if (unsubscribeApplications) {
+                unsubscribeApplications();
+                unsubscribeApplications = null;
+            }
+        }
+
+        // Felhasználói kérelmek megjelenítése
+        function displayUserApplications(applications) {
+            const listElement = document.getElementById('applicationsList');
+            
+            if (applications.length === 0) {
+                listElement.innerHTML = `
+                    <div style="padding: 40px; text-align: center; color: #666;">
+                        Még nincs beküldött kérelme. Használja a fenti szolgáltatásokat!
+                    </div>
+                `;
+                return;
+            }
+
+            const statusTexts = {
+                pending: 'Beküldve',
+                processing: 'Feldolgozás alatt',
+                completed: 'Teljesítve',
+                rejected: 'Elutasítva'
+            };
+
+            listElement.innerHTML = applications.map(app => `
+                <div class="application-item">
+                    <div>
+                        <h4>${app.title}</h4>
+                        <p style="color: #666; margin: 5px 0;">Beküldve: ${formatDate(app.createdAt)}</p>
+                        <p style="color: #666; font-size: 14px;">ID: ${app.id}</p>
+                    </div>
+                    <div class="status status-${app.status}">
+                        ${statusTexts[app.status]}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Admin kérelmek megjelenítése
+        function displayAdminApplications(applications) {
+            const listElement = document.getElementById('adminApplicationsList');
+            
+            if (applications.length === 0) {
+                listElement.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #666;">
+                        Nincs kérelem a rendszerben.
+                    </div>
+                `;
+                return;
+            }
+
+            const statusTexts = {
+                pending: 'Beküldve',
+                processing: 'Feldolgozás alatt',
+                completed: 'Teljesítve',
+                rejected: 'Elutasítva'
+            };
+
+            listElement.innerHTML = applications.map(app => `
+                <div class="admin-application-item">
+                    <div class="admin-details">
+                        <h4>${app.title}</h4>
+                        <div class="admin-user">👤 ${app.userEmail}</div>
+                        <p style="color: #666; margin: 5px 0;">Beküldve: ${formatDate(app.createdAt)}</p>
+                        <p style="color: #666; font-size: 14px;">ID: ${app.id}</p>
+                    </div>
+                    <div class="admin-actions">
+                        <select onchange="updateApplicationStatus('${app.id}', this.value)">
+                            <option value="pending" ${app.status === 'pending' ? 'selected' : ''}>Beküldve</option>
+                            <option value="processing" ${app.status === 'processing' ? 'selected' : ''}>Feldolgozás alatt</option>
+                            <option value="completed" ${app.status === 'completed' ? 'selected' : ''}>Teljesítve</option>
+                            <option value="rejected" ${app.status === 'rejected' ? 'selected' : ''}>Elutasítva</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="viewApplicationDetails('${app.id}', ${JSON.stringify(app).replace(/"/g, '&quot;')})">
+                            Részletek
+                        </button>
+                    </div>
+                    <div class="status status-${app.status}">
+                        ${statusTexts[app.status]}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Segédfüggvények
+        function getServiceTitle(serviceType) {
+            const titles = {
+                lakcim: 'Lakcímváltozás',
+                okmany: 'Okmány igénylés',
+                csalad: 'Családi ügy',
+                ado: 'Adóügy'
+            };
+            return titles[serviceType] || 'Ismeretlen szolgáltatás';
+        }
+
+        function formatDate(timestamp) {
+            if (timestamp?.toDate) {
+                return timestamp.toDate().toLocaleDateString('hu-HU');
+            }
+            return new Date(timestamp).toLocaleDateString('hu-HU');
+        }
+
+        function getFirebaseErrorMessage(error) {
+            const errorMessages = {
+                'auth/user-not-found': 'Felhasználó nem található',
+                'auth/wrong-password': 'Hibás jelszó',
+                'auth/email-already-in-use': 'Ez az e-mail cím már használatban van',
+                'auth/weak-password': 'A jelszó túl gyenge',
+                'auth/invalid-email': 'Érvénytelen e-mail cím',
+                'auth/too-many-requests': 'Túl sok próbálkozás. Próbálja később.',
+            };
+            return errorMessages[error.code] || 'Hiba történt: ' + error.message;
+        }
+
+        // UI függvények
+        function showMainSection() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('mainSection').classList.remove('hidden');
+            document.getElementById('userEmail').textContent = currentUser.email;
+            
+            // Admin panel megjelenítése
+            if (currentUser.isAdmin) {
+                document.getElementById('adminBadge').classList.remove('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+            } else {
+                document.getElementById('adminBadge').classList.add('hidden');
+                document.getElementById('adminPanel').classList.add('hidden');
+            }
+        }
+
+        function showLoginSection() {
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('mainSection').classList.add('hidden');
+        }
+
+        function updateStats(applications) {
+            const total = applications.length;
+            const pending = applications.filter(a => a.status === 'pending' || a.status === 'processing').length;
+            const completed = applications.filter(a => a.status === 'completed').length;
+
+            document.getElementById('totalApplications').textContent = total;
+            document.getElementById('pendingApplications').textContent = pending;
+            document.getElementById('completedApplications').textContent = completed;
+        }
+
+        // Szolgáltatás űrlapok és további függvények...
+        // (A korábbi kódból átvéve, de Firebase integráció nélkül)
+        
+        window.openServiceForm = function(serviceType) {
+            if (!currentUser) {
+                showNotification('Kérem, jelentkezzen be először!', 'error');
+                return;
+            }
+
+            const modal = document.getElementById('formModal');
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            
+            // Űrlap mezők (ugyanaz mint korábban)
+            const forms = {
+                lakcim: {
+                    title: '🏠 Lakcímváltozás bejelentése',
+                    fields: `
+                        <div class="form-group">
+                            <label>Típus</label>
+                            <select id="lakcimTipus">
+                                <option value="allando">Állandó lakcím</option>
+                                <option value="ideiglenes">Ideiglenes lakcím</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Új cím</label>
+                            <input type="text" id="ujCim" placeholder="Irányítószám, város, utca, házszám" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Költözés dátuma</label>
+                            <input type="date" id="koltozesDatum" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Megjegyzés</label>
+                            <textarea id="megjegyzes" placeholder="Kiegészítő információk"></textarea>
+                        </div>
+                    `
+                },
+                // További szolgáltatások...
+            };
+
+            const form = forms[serviceType];
+            if (form) {
+                document.getElementById('modalTitle').textContent = form.title;
+                document.getElementById('modalBody').innerHTML = `
+                    ${form.fields}
+                    <button class="btn btn-primary" type="button" style="width: 100%; margin-top: 20px;" onclick="submitApplication('${serviceType}')">
+                        Kérelem beküldése
+                    </button>
+                `;
+            }
+        };
+
+        window.closeModal = function() {
+            const modal = document.getElementById('formModal');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            document.getElementById('modalBody').innerHTML = '';
+        };
+
+        window.showNotification = function(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 4000);
+        };
+
+        window.viewApplicationDetails = function(appId, appData) {
+            const modal = document.getElementById('formModal');
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            
+            document.getElementById('modalTitle').textContent = `📋 ${appData.title} - Részletek`;
+            
+            let detailsHtml = `
+                <div style="margin-bottom: 20px;">
+                    <strong>Kérelmező:</strong> ${appData.userEmail}<br>
+                    <strong>Beküldve:</strong> ${formatDate(appData.createdAt)}<br>
+                    <strong>ID:</strong> ${appData.id}<br>
+                    <strong>Státusz:</strong> <span class="status status-${appData.status}">${
+                        {pending: 'Beküldve', processing: 'Feldolgozás alatt', completed: 'Teljesítve', rejected: 'Elutasítva'}[appData.status]
+                    }</span>
+                </div>
+                <hr style="margin: 20px 0;">
+                <h4>Beküldött adatok:</h4>
+            `;
+            
+            for (const [key, value] of Object.entries(appData.data || {})) {
+                if (value) {
+                    detailsHtml += `<p><strong>${key}:</strong> ${value}</p>`;
+                }
+            }
+            
+            document.getElementById('modalBody').innerHTML = detailsHtml;
+        };
+
+    </script>
+    <style>
+        /* Ugyanaz a CSS mint korábban */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1001;
+            animation: slideIn 0.3s ease;
+        }
+
+        .notification.success {
+            background: #28a745;
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        .form-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        /* További CSS szabályok... */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Bejelentkezési oldal -->
+        <div id="loginSection">
+            <div class="login-form card">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #764ba2;">
+                    🏛️ Firebase Ügyintéző Portál
+                </h2>
+                
+                <div class="form-group">
+                    <label for="email">E-mail cím</label>
+                    <input type="email" id="email" placeholder="pelda@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Jelszó</label>
+                    <input type="password" id="password" placeholder="Jelszó" required>
+                </div>
+                
+                <button class="btn btn-primary" style="width: 100%; margin-bottom: 15px;" onclick="login()">
+                    Bejelentkezés
+                </button>
+                
+                <button class="btn btn-secondary" style="width: 100%;" onclick="register()">
+                    Regisztráció
+                </button>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4>🔧 Firebase beállítás szükséges!</h4>
+                    <p style="font-size: 14px; margin-top: 10px;">
+                        1. Hozzon létre Firebase projektet<br>
+                        2. Engedélyezze az Authentication-t<br>
+                        3. Hozzon létre Firestore adatbázist<br>
+                        4. Cserélje ki a firebaseConfig objektumot!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Főoldal -->
+        <div id="mainSection" class="hidden">
+            <div class="header">
+                <div class="logo">🏛️ Firebase Ügyintéző</div>
+                <div class="user-info">
+                    <span id="userEmail"></span>
+                    <span id="adminBadge" class="hidden" style="background: #28a745; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px; margin-right: 10px;">ADMIN</span>
+                    <button class="btn btn-secondary" onclick="logout()">Kijelentkezés</button>
+                </div>
+            </div>
+
+            <!-- Statisztikák -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalApplications">0</div>
+                    <div class="stat-label">Összes kérelem</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pendingApplications">0</div>
+                    <div class="stat-label">Függőben lévő</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completedApplications">0</div>
+                    <div class="stat-label">Teljesített</div>
+                </div>
+            </div>
+
+            <!-- Szolgáltatások -->
+            <h2 style="margin-bottom: 20px; color: white;">Elérhető szolgáltatások</h2>
+            <div class="services-grid">
+                <div class="service-card" onclick="openServiceForm('lakcim')">
+                    <div class="service-icon">🏠</div>
+                    <div class="service-title">Lakcímváltozás</div>
+                    <div class="service-desc">Állandó vagy ideiglenes lakcím bejelentése</div>
+                </div>
+            </div>
+
+            <!-- Kérelmeim -->
+            <h2 style="margin-bottom: 20px; color: white;">Kérelmeim</h2>
+            <div class="applications-list" id="applicationsList">
+                <div style="padding: 40px; text-align: center; color: #666;">
+                    Betöltés...
+                </div>
+            </div>
+
+            <!-- Admin panel -->
+            <div id="adminPanel" class="hidden">
+                <h2 style="margin-bottom: 20px; color: white;">🛠️ Admin Panel</h2>
+                <div class="card">
+                    <div id="adminApplicationsList">
+                        <div style="padding: 20px; text-align: center; color: #666;">
+                            Betöltés...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="formModal" class="form-modal hidden" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Szolgáltatás</h3>
+                <button class="close-btn" onclick="closeModal()" type="button">&times;</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+</body>
+</html>
