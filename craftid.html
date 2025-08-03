@@ -13,12 +13,13 @@
 
         // ⚠️ CSERÉLJE KI A SAJÁT FIREBASE KONFIGURÁCIÓJÁRA! ⚠️
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY_HERE",
-            authDomain: "your-project.firebaseapp.com",
-            projectId: "your-project-id",
-            storageBucket: "your-project.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "your-app-id"
+        apiKey: "AIzaSyBfkcNHasJkMJz_mpNczcseQAmfDRV5hUI",
+        authDomain: "craftlandia-online.firebaseapp.com",
+        projectId: "craftlandia-online",
+        storageBucket: "craftlandia-online.firebasestorage.app",
+        messagingSenderId: "741338614553",
+        appId: "1:741338614553:web:74ae48162cf3bc2c6e5388",
+        measurementId: "G-QQ1PFTBFZT"
         };
 
         // Firebase inicializálása
@@ -31,7 +32,7 @@
         let unsubscribeApplications = null;
 
         // Admin felhasználók listája (Firestore-ban külön collection-ben tárolható)
-        const adminEmails = ['admin@ugy.hu', 'your-admin@email.com'];
+        const adminEmails = ['craftlandiaonlinne@gmail.com'];
 
         // Auth státusz változás figyelése
         onAuthStateChanged(auth, (user) => {
